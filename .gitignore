@@ -1,0 +1,6 @@
+node_modules
+loxberry
+**/logs/*
+build
+.DS_Store
+.vscode

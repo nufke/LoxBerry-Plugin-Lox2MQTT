@@ -1,0 +1,27 @@
+{
+    "winston": [
+    {
+        "Console": {
+            "level": "error",
+            "colorize": true,
+            "timestamp": true
+        }
+    },
+    {
+        "File" : {
+            "level": "error",
+            "timestamp": true,
+            "filename": "../../../log/plugins/lox2mqtt/lox2mqtt.log"
+        }
+    }
+    ],
+    "app": {
+        "subscribe": true,
+        "mqtt_topic": "loxberry/app",
+        "icon_path": "/assets/icons/svg",
+        "publish_structure": false
+    },
+    "miniserver": {
+        "mqtt_topic": "loxone"
+    }
+}

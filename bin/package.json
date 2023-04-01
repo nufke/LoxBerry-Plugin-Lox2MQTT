@@ -1,0 +1,39 @@
+{
+  "name": "lox2mqtt",
+  "version": "0.0.1",
+  "description": "Loxone Miniserver communicating with MQTT server",
+  "main": "lib/index.js",
+  "bin": {
+    "lox-mqtt": "bin/lox2mqtt.js"
+  },
+  "scripts": {
+    "start": "pm2 start lox2mqtt",
+    "stop": "pm2 stop lox2mqtt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nufke/LoxBerry-Plugin-Lox2MQTT.git"
+  },
+  "keywords": [
+    "Loxone",
+    "API",
+    "MQTT"
+  ],
+  "author": "Martin Barnasconi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nufke/LoxBerry-Plugin-Lox2MQTT/issues"
+  },
+  "homepage": "https://github.com/nufke/LoxBerry-Plugin-Lox2MQTT/",
+  "dependencies": {
+    "config": ">=1.20.0",
+    "mqtt": ">=1.7.0",
+    "node-lox-structure-file": "git+https://github.com/nufke/node-lox-structure-file.git#a1617f5",
+    "node-lox-ws-api": "^0.4.5",
+    "unidecode": ">=0.1.7",
+    "winston": ">=2.2.0"
+  },
+  "devDependencies": {
+    "vows": ">=0.8.1"
+  }
+}
