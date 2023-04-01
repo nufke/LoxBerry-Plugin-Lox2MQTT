@@ -1,13 +1,11 @@
 {
-    "winston": [
-    {
+    "logging": [{
         "File" : {
-            "level": "error",
+            "filename": "../../../log/plugins/lox2mqtt/lox2mqtt.log",
             "timestamp": true,
-            "filename": "../../../log/plugins/lox2mqtt/lox2mqtt.log"
+            "level": "error"
         }
-    }
-    ],
+    }],
     "app": {
         "subscribe": true,
         "mqtt_topic": "loxberry/app",

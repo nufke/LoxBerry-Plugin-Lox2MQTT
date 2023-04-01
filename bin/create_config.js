@@ -17,16 +17,16 @@ function update_config(config) {
   if (!config)
     config = {};
 
-  if (!config.winston) {
-    config.winston = [];
+  if (!config.logging) {
+    config.logging = [];
     let file = {
       "File" : {
-          "level": "debug",
+          "filename": "../../../log/plugins/lox2mqtt/lox2mqtt.log",
           "timestamp": true,
-          "filename": "../../../log/plugins/lox2mqtt/lox2mqtt.log"
+          "level": "debug"
       }
     };
-    config.winston.push(file);
+    config.logging.push(file);
   }
 
   if (!config.app)

@@ -16,7 +16,7 @@ try {
     return;
 }
 
-var logger = lox2mqtt.Logger(config.get('winston'));
+var logger = lox2mqtt.Logger(config.get('logging'));
 var app = new lox2mqtt.App(logger);
 var mqtt_client = lox2mqtt.mqtt_builder(syscnf, app);
 

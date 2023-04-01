@@ -4,10 +4,9 @@ var Logger = function(config) {
     if (!config){
         return winston.createLogger({
             transports: [
-                new (winston.transports.Console)({
+                new (winston.transports.File)({
                     timestamp: true,
-                    colorize: true,
-                    level: 'debug',
+                    level: 'error',
                 })
             ]
         });
