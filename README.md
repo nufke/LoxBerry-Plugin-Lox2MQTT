@@ -4,9 +4,13 @@ LoxBerry plugin to enable communication between the Loxone Miniserver and MQTT. 
 
 *NOTE: The current version is not production ready. Use it at your own risk.*
 
+## Installation
+
+Use the LoxBerry plugin installation procedure.
+
 ## Configuration
 
-After installation, the configuation file can be found in `/opt/loxberry/config/plugins/lox2mqtt/default.json`:
+The default configuation file can be found in `/opt/loxberry/config/plugins/lox2mqtt/default.json`:
 
 ```json
 {
@@ -29,7 +33,14 @@ After installation, the configuation file can be found in `/opt/loxberry/config/
 }
 ```
 
-*NOTE: As the LoxBerry and its MQTT server is used, the plugin configuration file does not specify the Miniserver and MQTT server settings. Instead, the LoxBerry general settings are used.*
+*NOTE 1: As the LoxBerry and its MQTT server is used, the plugin configuration file does not specify the Miniserver and MQTT server settings. Instead, the LoxBerry general settings are used.*
+
+*NOTE 2: The current version of the plugin does not support configuration via the LoxBerry web interface. Instead update the configuration file `default.json` directly and restart Lox2MQTT:*
+
+```bash
+cd /opt/loxberry/bin/plugins/lox2mqtt
+pm2 restart lox2mqtt
+```
 
 ## Miniserver to MQTT Broadcast
 
@@ -54,7 +65,7 @@ Where `loxone` is the MQTT topic indicating a Miniserver message, `0123456789AB`
 To control the Loxone Miniserver, a messages should be send using the following topic structure:
 
 ```
-<miniserver mqtt_topic>/<serialnr>/<uuid>/cmd <value>
+<miniserver.mqtt_topic>/<serialnr>/<uuid>/cmd <value>
 ```
 
 **Example**
