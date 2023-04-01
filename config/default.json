@@ -1,13 +1,6 @@
 {
     "winston": [
     {
-        "Console": {
-            "level": "error",
-            "colorize": true,
-            "timestamp": true
-        }
-    },
-    {
         "File" : {
             "level": "error",
             "timestamp": true,

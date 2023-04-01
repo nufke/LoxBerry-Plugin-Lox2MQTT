@@ -19,13 +19,6 @@ function update_config(config) {
 
   if (!config.winston) {
     config.winston = [];
-    let console = {
-      "Console": {
-        "level": "error",
-        "colorize": true,
-        "timestamp": true
-      }
-    };
     let file = {
       "File" : {
           "level": "debug",
@@ -33,7 +26,6 @@ function update_config(config) {
           "filename": "../../../log/plugins/lox2mqtt/lox2mqtt.log"
       }
     };
-    config.winston.push(console);
     config.winston.push(file);
   }
 
