@@ -15,7 +15,6 @@ var MsClient = function (app, config, msid, mqtt_client) {
         return;
     }
 
-    // TODO add more miniservers
     var lox_ms_client = WebSocket(app, syscnf, msid);
     var lox_mqtt_adaptor = undefined;
 
