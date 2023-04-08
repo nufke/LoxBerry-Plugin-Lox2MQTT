@@ -79,3 +79,21 @@ loxone/0123456789AB/01234567-abcd-0123-ffffeeeeddddcccc/cmd Off
 ```
 
 In this example, a switch on Miniserver `0123456789AB` with uuid `01234567-abcd-0123-ffffeeeeddddcccc` is switched `Off`.
+
+## FAQ
+
+**Q: What is the difference between the LoxBerry MQTT Gateway and Lox2MQTT?**
+
+A: LoxBerry MQTT Gateway communicates to the Miniserver via HTTP Virtual Inputs or UDP messages, which require additional infrastructure in your Loxone Config program. The Lox2MQTT plugin connects to the Miniserver websocket and has direct access to the Miniserver controls and states. Therefore there are no changes required in your Loxone Config program.
+
+**Q: I receive state information from my Miniserver over MQTT, but I do not recognize the format and identifiers**
+
+A: A received MQTT message has the following format: `miniserver_mqtt_topic>/<serialnr>/<uuid> <value>`. Each MQTT message uses the topic `miniserver_mqtt_topic` to identify messages coming from a Loxone Miniserver. The next topic level specifies the serial number `serialnr` of your Miniserver, followed by the unique identifier `uuid` representing a control state, which can be found in the Loxone structure file `LoxAPP3.json` on your Miniserver.
+
+**Q: Can I change the Miniserver control states via MQTT?**
+
+A: Yes, you can send MQTT messages which are converted to commands for the Loxone Miniserver. A transmited MQTT message should have the following format: `miniserver_mqtt_topic>/<serialnr>/<uuid>/cmd <command>`. Note the `/cmd` extension in this message, which is added to the unique identifier of a control or subcontrol. The allowed values for `command` are defined for each control, which can be found in the [Loxone Structure File](https://www.loxone.com/dede/wp-content/uploads/sites/2/2022/06/1300_Structure-File.pdf)
+
+## Issues and questions
+
+Please submit your issues and questions via the GitHub issue tracker: https://github.com/nufke/LoxBerry-Plugin-Lox2MQTT/issues or use https://www.loxforum.com
