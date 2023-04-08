@@ -1,5 +1,6 @@
 module.exports = {
     "Adaptor": require("./Adaptor.js"),
+    "MsClient": require("./MsClient.js"),
     "Logger": require("./Logger.js"),
     "mqtt_builder": require("./mqtt_builder.js"),
     "App": require("./App.js"),

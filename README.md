@@ -18,28 +18,32 @@ The default configuation file can be found in `/opt/loxberry/config/plugins/lox2
         "File" : {
             "filename": "../../../log/plugins/lox2mqtt/lox2mqtt.log",
             "timestamp": true,
-            "level": "error"
+            "level": "info"
         }
     }],
     "app": {
-        "subscribe": true,
         "mqtt_topic": "loxberry/app",
-        "icon_path": "/assets/icons/svg",
-        "publish_structure": false
+        "icon_path": "/assets/icons/svg"
     },
     "miniserver": {
-        "mqtt_topic": "loxone"
+        "1" : {
+            "mqtt_topic": "loxone",
+            "publish_structure": false,
+            "subscribe": true
+        }
     }
 }
 ```
 
-*NOTE 1: As the LoxBerry and its MQTT server is used, the plugin configuration file does not specify the Miniserver and MQTT server settings. Instead, the LoxBerry general settings are used.*
+The `logging` section allows customization for the logging. The `app` section will be used for future communcation with a LoxBerry App made of mobile and tablets. The `miniserver` section specifies the MQTT topic to publish Miniserver state changes and control structure. It also defines if the Miniserver subscribes to MQTT topics to enable changing control states. Registration of multiple Miniservers is supported. Make sure that the index of the specified Miniservers match with the IDs defined in `/opt/loxberry/config/system/general.json`.
 
-*NOTE 2: The current version of the plugin does not support configuration via the LoxBerry web interface. Instead update the configuration file `default.json` directly and restart Lox2MQTT:*
+*NOTE 1: As the LoxBerry and its MQTT server is used, the plugin configuration file does not specify the Miniserver and MQTT server settings such as IP and port address. Instead, the LoxBerry general settings are used.*
+
+*NOTE 2: The current version of the plugin does not support configuration via the LoxBerry web interface. Instead, update the configuration file `/opt/loxberry/config/plugins/lox2mqtt/default.json` directly and restart Lox2MQTT:*
 
 ```bash
 cd /opt/loxberry/bin/plugins/lox2mqtt
-pm2 restart lox2mqtt
+npm run restart
 ```
 
 ## Miniserver to MQTT Broadcast

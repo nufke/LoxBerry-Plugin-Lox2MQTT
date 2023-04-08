@@ -20,35 +20,29 @@ function update_config(config) {
   if (!config.logging) {
     config.logging = [];
     let file = {
-      "File" : {
-          "filename": "../../../log/plugins/lox2mqtt/lox2mqtt.log",
-          "timestamp": true,
-          "level": "debug"
+      "File": {
+        "filename": "../../../log/plugins/lox2mqtt/lox2mqtt.log",
+        "timestamp": true,
+        "level": "debug"
       }
     };
     config.logging.push(file);
   }
 
   if (!config.app)
-    config.app = {};
-
-  if (!config.app.subscribe)
-    config.app.subscribe = true;
-
-  if (!config.app.mqtt_topic || !config.app.mqtt_topic.length)
-    config.app.mqtt_topic = 'loxberry/app';
-
-  if (!config.app.icon_path || !config.app.icon_path.length)
-    config.app.icon_path = '/assets/icons/svg';
-
-  if (!config.app.publish_structure)
-    config.app.publish_structure = false;
+    config.app = {
+      "mqtt_topic": "loxberry/app",
+      "icon_path": "/assets/icons/svg"
+    };
 
   if (!config.miniserver)
-    config.miniserver = {};
-
-  if (!config.miniserver.mqtt_topic || !config.miniserver.mqtt_topic.length)
-    config.miniserver.mqtt_topic = 'loxone';
+    config.miniserver = {
+      "1": {
+        "mqtt_topic": "loxone",
+        "publish_structure": false,
+        "subscribe": true
+      }
+    }
 
   fs.writeFileSync(process.env.LBPCONFIG + '/lox2mqtt/default.json', JSON.stringify(config));
 }

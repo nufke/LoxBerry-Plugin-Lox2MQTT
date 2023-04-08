@@ -7,7 +7,8 @@ function _limit_string(text, limit){
     return text.substr(0, limit) + '...(' + text.length + ')';
 }
 
-var WebSocketAPI = function(miniserver, app) {
+var WebSocketAPI = function(app, syscnf, msid) {
+    var miniserver = syscnf.Miniserver[msid];
     var client = new node_lox_ws_api(miniserver.Ipaddress, miniserver.Admin, miniserver.Pass, true, 'AES-256-CBC');
     var text_logger_limit = 100;
 
@@ -16,28 +17,28 @@ var WebSocketAPI = function(miniserver, app) {
     });
 
     client.on('connect', function() {
-        app.logger.info("WebSocketAPI - connect");
+        app.logger.info("WebSocketAPI " + miniserver.Ipaddress + " - connect");
     });
 
     client.on('authorized', function() {
-        app.logger.info("WebSocketAPI - authorized");
+        app.logger.info("WebSocketAPI " + miniserver.Ipaddress + " - authorized");
     });
 
     client.on('connect_failed', function() {
-        app.logger.error("WebSocketAPI - connect failed");
+        app.logger.error("WebSocketAPI " + miniserver.Ipaddress + " - connect failed");
     });
 
     client.on('connection_error', function(error) {
-        app.logger.error("WebSocketAPI - connection error: "+error);
+        app.logger.error("WebSocketAPI " + miniserver.Ipaddress + " - connection error: " + error);
         app.exit(1);
     });
 
     client.on('close', function() {
-        app.logger.info("WebSocketAPI - close");
+        app.logger.info("WebSocketAPI " + miniserver.Ipaddress + " - close");
     });
 
     client.on('send', function(message) {
-        app.logger.debug("WebSocketAPI - send message: "+message);
+        app.logger.debug("WebSocketAPI " + miniserver.Ipaddress + " - send message: " + message);
     });
 
     client.on('message_text', function(message) {
@@ -56,7 +57,7 @@ var WebSocketAPI = function(miniserver, app) {
             default:
                 data.text = _limit_string(message.data, text_logger_limit);
         }
-        app.logger.debug("WebSocketAPI - received text message: ", data);
+        app.logger.debug("WebSocketAPI " + miniserver.Ipaddress + " - received text message: ", data);
     });
 
     client.on('message_file', function(message) {
@@ -74,7 +75,7 @@ var WebSocketAPI = function(miniserver, app) {
             default:
                 data.text = _limit_string(message.data, text_logger_limit);
         }
-        app.logger.debug("WebSocketAPI - received file: ", data);
+        app.logger.debug("WebSocketAPI " + miniserver.Ipaddress + " - received file: ", data);
     });
 
     function _update_event(uuid, evt) {
@@ -82,7 +83,7 @@ var WebSocketAPI = function(miniserver, app) {
             uuid: uuid,
             'event': _limit_string(JSON.stringify(evt), text_logger_limit),
         };
-        app.logger.debug("WebSocketAPI - received update event: ", data);
+        app.logger.debug("WebSocketAPI " + miniserver.Ipaddress + " - received update event: ", data);
     }
 
     client.on('update_event_value', _update_event);
@@ -91,27 +92,27 @@ var WebSocketAPI = function(miniserver, app) {
     client.on('update_event_weather', _update_event);
 
     client.on('message_invalid', function(message) {
-        app.logger.warn("WebSocketAPI - invalid message: "+JSON.stringify(message));
+        app.logger.warn("WebSocketAPI " + miniserver.Ipaddress + " - invalid message: "+JSON.stringify(message));
     });
 
     client.on('keepalive', function(time) {
-        app.logger.debug('WebSocketAPI - keepalive (' + time + 'ms)');
+        app.logger.debug("WebSocketAPI " + miniserver.Ipaddress + " - keepalive (" + time + "ms)");
     });
 
     client.on('message_header', function(header) {
-        app.logger.debug('WebSocketAPI - received message header (' + header.next_state()+'):', header);
+        app.logger.debug("WebSocketAPI " + miniserver.Ipaddress + " - received message header (" + header.next_state() + "):", header);
     });
 
     client.on('message_event_table_values', function(messages) {
-        app.logger.debug('WebSocketAPI - received value messages:', messages.length);
+        app.logger.debug("WebSocketAPI " + miniserver.Ipaddress + " - received value messages:", messages.length);
     });
 
     client.on('message_event_table_text', function(messages) {
-        app.logger.debug('WebSocketAPI - received text messages:', messages.length);
+        app.logger.debug("WebSocketAPI " + miniserver.Ipaddress + "- received text messages:", messages.length);
     });
 
     client.on('get_structure_file', function(data) {
-        app.logger.debug("WebSocketAPI - get structure file " + data.lastModified);
+        app.logger.debug("WebSocketAPI " +  miniserver.Ipaddress + "- get structure file " + data.lastModified);
     });
 
     return client;

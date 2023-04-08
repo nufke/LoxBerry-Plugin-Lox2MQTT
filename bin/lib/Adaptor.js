@@ -3,23 +3,11 @@ const events = require('events');
 
 var config = require("config");
 
-var Adaptor = function (structure) {
+var Adaptor = function (structure, mqtt_topic_lox, mqtt_topic_app, icon_path) {
     this.structure = structure;
-    this.mqtt_topic_lox = config.miniserver.mqtt_topic;
-    this.mqtt_topic_app = config.app.mqtt_topic;
-    this.icon_path =  config.app.icon_path;
-
-    if (this.mqtt_topic_lox === undefined || !this.mqtt_topic_lox.length) {
-        this.mqtt_topic_lox = 'loxone';
-    }
-
-    if (this.mqtt_topic_app === undefined || !this.mqtt_topic_app.length) {
-        this.mqtt_topic_app = 'loxberry/app';
-    }
-
-    if (this.icon_path === undefined || !this.icon_path.length) {
-        this.icon_path = '/assets/icons/svg';
-    }
+    this.mqtt_topic_lox = mqtt_topic_lox;
+    this.mqtt_topic_app = mqtt_topic_app;
+    this.icon_path = icon_path;
 
     this.device_info = this.structure.msInfo.serialNr;
     this.path2control = {};
@@ -36,6 +24,10 @@ Adaptor.prototype.set_value_for_uuid = function(uuid, value) {
     this.structure.set_value_for_uuid(uuid, value);
     this.emit('for_mqtt', this.mqtt_topic_lox + '/' + this.device_info + '/' + uuid, value, true);
 };
+
+Adaptor.prototype.get_serialnr = function() {
+    return this.device_info;
+}
 
 Adaptor.prototype.get_command_from_topic = function(topic, data) {
     var path_groups = topic.match('^(.+)/cmd$');

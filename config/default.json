@@ -3,16 +3,18 @@
         "File" : {
             "filename": "../../../log/plugins/lox2mqtt/lox2mqtt.log",
             "timestamp": true,
-            "level": "error"
+            "level": "info"
         }
     }],
     "app": {
-        "subscribe": true,
         "mqtt_topic": "loxberry/app",
-        "icon_path": "/assets/icons/svg",
-        "publish_structure": false
+        "icon_path": "/assets/icons/svg"
     },
     "miniserver": {
-        "mqtt_topic": "loxone"
+        "1" : {
+            "mqtt_topic": "loxone",
+            "publish_structure": false,
+            "subscribe": true
+        }
     }
 }
