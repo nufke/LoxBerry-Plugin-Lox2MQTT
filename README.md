@@ -35,7 +35,7 @@ The default configuation file can be found in `/opt/loxberry/config/plugins/lox2
 }
 ```
 
-The `logging` section allows customization for the logging. The `app` section will be used for future communcation with a LoxBerry App made of mobile and tablets. The `miniserver` section specifies the MQTT topic to publish Miniserver state changes and control structure. It also defines if the Miniserver subscribes to MQTT topics to enable changing control states. Registration of multiple Miniservers is supported. Make sure that the index of the specified Miniservers match with the IDs defined in `/opt/loxberry/config/system/general.json`.
+The `logging` section allows customization for the logging. The `app` section will be used for future communcation with a LoxBerry App. The `miniserver` section specifies the MQTT topic to publish Miniserver state changes and control structure. It also defines if the Miniserver subscribes to MQTT topics to enable changing control states. Registration of multiple Miniservers is supported. Make sure that the index of the specified Miniservers match with the IDs defined in `/opt/loxberry/config/system/general.json`.
 
 *NOTE 1: As the LoxBerry and its MQTT server is used, the plugin configuration file does not specify the Miniserver and MQTT server settings such as IP and port address. Instead, the LoxBerry general settings are used.*
 
@@ -51,10 +51,10 @@ npm run restart
 Each Miniserver states change is broadcasted over MQTT, using the following topic structure:
 
 ```
-<miniserver.mqtt_topic>/<serialnr>/<uuid> <message>
+<miniserver_mqtt_topic>/<serialnr>/<uuid> <message>
 ```
 
-Each MQTT message uses the topic `<mqtt_topic>` to identify messages coming from a Loxone Miniserver. The next topic level specifies the `serialnr` of the Miniserver, followed by the unique identifier `uuid` representing a control state, which can be found in the Loxone structure file `LoxAPP3.json` on your Miniserver.
+Each MQTT message uses the topic `<miniserver_mqtt_topic>` as is defined in the configuration file for each Miniserver, to identify messages send to or from a Loxone Miniserver. The next topic level specifies the serial number `serialnr` of the Miniserver, followed by a unique identifier `uuid` representing a control state, which can be found in the Loxone structure file `LoxAPP3.json` on your Miniserver.
 
 **Example**
 
@@ -62,14 +62,14 @@ Each MQTT message uses the topic `<mqtt_topic>` to identify messages coming from
 loxone/0123456789AB/01234567-abcd-0123-ffffeeeeddddcccc/states/value 0.8431345820426941
 ```
 
-Where `loxone` is the MQTT topic indicating a Miniserver message, `0123456789AB` is the Miniserver serial nr., and `01234567-abcd-0123-ffffeeeeddddcccc` the uuid of one of the control state field, and the value is `0.8431345820426941`.
+Where `loxone` is the MQTT topic indicating a Miniserver message, `0123456789AB` is the Miniserver serial nr., and `01234567-abcd-0123-ffffeeeeddddcccc` the uuid of the control state, and the value is `0.8431345820426941`.
 
 ## Controling the Loxone Miniserver via MQTT
 
 To control the Loxone Miniserver, a messages should be send using the following topic structure:
 
 ```
-<miniserver.mqtt_topic>/<serialnr>/<uuid>/cmd <value>
+<miniserver_mqtt_topic>/<serialnr>/<uuid>/cmd <value>
 ```
 
 **Example**
