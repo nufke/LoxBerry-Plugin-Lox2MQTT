@@ -56,7 +56,7 @@ Each Miniserver states change is broadcasted over MQTT, using the following topi
 
 Each MQTT message uses the topic `<miniserver_mqtt_topic>` as is defined in the configuration file for each Miniserver, to identify messages send to or from a Loxone Miniserver. The next topic level specifies the serial number `serialnr` of the Miniserver, followed by a unique identifier `uuid`, and `state` representing a control state, which can be found in the Loxone structure file `LoxAPP3.json` on your Miniserver.
 
-As MQTT topics are case sentitive, the `CamelCase` strings used in the Loxone structure file `LoxAPP3.json` representing the `state` are mapped to lowercase `snake_case` as topic strings.
+As MQTT topics are case sentitive, the `CamelCase` state names as defined in the Loxone structure file `LoxAPP3.json` are mapped to lowercase `snake_case` topic strings. For example, the state `activeMoodsNum` of a control of type `LightControllerV2` is translated into `active_moods_num`.
 
 **Example**
 
@@ -72,7 +72,11 @@ To control the Loxone Miniserver, a messages should be send using the following 
 
 ```
 <miniserver_mqtt_topic>/<serialnr>/<uuid>/cmd <command>
+or
+<miniserver_mqtt_topic>/<serialnr>/<uuid>/<subcontrol>/cmd <command>
 ```
+
+Note that Loxone subcontrols share the same `uuid` inherited from the parent control, and therefore define an additional string `subcontrol`.
 
 **Example**
 
@@ -90,7 +94,7 @@ A: LoxBerry MQTT Gateway communicates to the Miniserver via HTTP Virtual Inputs 
 
 **Q: I receive state information from my Miniserver over MQTT, but I do not recognize the format and identifiers**
 
-A: A received MQTT message has the following format: `<miniserver_mqtt_topic>/<serialnr>/<uuid> <value>`. Each MQTT message uses the topic `miniserver_mqtt_topic` to identify messages coming from a Loxone Miniserver. The next topic level specifies the serial number `serialnr` of your Miniserver, followed by the unique identifier `uuid` representing a control state, which can be found in the Loxone structure file `LoxAPP3.json` on your Miniserver.
+A: A received MQTT message has the following format: `<miniserver_mqtt_topic>/<serialnr>/<uuid>/states/<state> <value>`. Each MQTT message uses the topic `miniserver_mqtt_topic` to identify messages coming from a Loxone Miniserver. The next topic level specifies the serial number `serialnr` of your Miniserver, followed by the unique identifier `uuid` and `state` representing a control state, which can be found in the Loxone structure file `LoxAPP3.json` on your Miniserver.
 
 **Q: Can I change the Miniserver control states via MQTT?**
 
