@@ -15,6 +15,11 @@ var MsClient = function (app, config, msid, mqtt_client) {
         return;
     }
 
+    if (!syscnf.Miniserver[msid]) {
+        app.logger.error("Miniserver with id " + msid + " not found.");
+        return;
+    }
+
     var lox_ms_client = WebSocket(app, syscnf, msid);
     var lox_mqtt_adaptor = undefined;
 
@@ -24,12 +29,12 @@ var MsClient = function (app, config, msid, mqtt_client) {
     }
 
     // check configuration variables
-    var mqtt_topic_app = config.app.mqtt_topic;
-    var icon_path = config.app.icon_path;
-    var mqtt_topic_lox = config.miniserver[msid].mqtt_topic;
+    var mqtt_topic_app = config.mqtt_topic_app;
+    var icon_path = config.app_icon_path;
+    var mqtt_topic_ms = config.miniserver[msid].mqtt_topic_ms;
 
-    if (mqtt_topic_lox === undefined || !mqtt_topic_lox.length) {
-        mqtt_topic_lox = 'loxone';
+    if (mqtt_topic_ms === undefined || !mqtt_topic_ms.length) {
+        mqtt_topic_ms = 'loxone';
     }
 
     if (mqtt_topic_app === undefined || !mqtt_topic_app.length) {
@@ -58,17 +63,22 @@ var MsClient = function (app, config, msid, mqtt_client) {
             function (value) {
                 app.logger.warn("MQTT Structure - invalid type of control", value);
             }
-        ), mqtt_topic_lox, mqtt_topic_app, icon_path);
+        ), mqtt_topic_ms, mqtt_topic_app, icon_path);
 
         if (config.miniserver[msid].subscribe)
             mqtt_client.subscribe(lox_mqtt_adaptor.get_topics_for_subscription());
 
         lox_mqtt_adaptor.on('for_mqtt', function (topic, data, retain_) {
-            let payload = String(data);
-            let options = { retain: retain_ };
-            app.logger.debug("MQTT Adaptor - for mqtt: ", { topic: topic, data: payload });
-            var fixedTopicName = topic.replace("+", "_").replace("#", "_")
-            mqtt_client.publish(fixedTopicName, payload, options);
+
+            if (config.miniserver[msid].publish_states) {
+                let payload = String(data);
+                let options = { retain: retain_ };
+                app.logger.debug("MQTT Adaptor - Miniserver for MQTT: ", { topic: topic, data: payload });
+                var fixedTopicName = topic.replace("+", "_").replace("#", "_")
+                mqtt_client.publish(fixedTopicName, payload, options);
+            } else {
+                app.logger.debug("MQTT Adaptor - Miniserver not publishing states");
+            }
         });
 
         if (config.miniserver[msid].publish_structure)
@@ -89,7 +99,7 @@ var MsClient = function (app, config, msid, mqtt_client) {
 
     mqtt_client.on('message', function (topic, message, packet) {
         // only send to Miniserver if adapter exists and the serial number in the topic matches
-        if ((!lox_mqtt_adaptor) && (topic.search(mqtt_topic_lox + "/" + lox_mqtt_adaptor.get_serialnr()) != 0)) {
+        if ((!lox_mqtt_adaptor) && (topic.search(mqtt_topic_ms + "/" + lox_mqtt_adaptor.get_serialnr()) != 0)) {
             return;
         }
 
@@ -100,7 +110,7 @@ var MsClient = function (app, config, msid, mqtt_client) {
         if (config.miniserver[msid].subscribe) {
             lox_ms_client.send_cmd(action.uuidAction, action.command);
         } else {
-            app.logger.debug("MQTT Adaptor - readonly mode");
+            app.logger.debug("MQTT Adaptor - Miniserver in readonly mode");
         }
     });
 

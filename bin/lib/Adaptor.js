@@ -3,9 +3,9 @@ const events = require('events');
 
 var config = require("config");
 
-var Adaptor = function (structure, mqtt_topic_lox, mqtt_topic_app, icon_path) {
+var Adaptor = function (structure, mqtt_topic_ms, mqtt_topic_app, icon_path) {
     this.structure = structure;
-    this.mqtt_topic_lox = mqtt_topic_lox;
+    this.mqtt_topic_ms = mqtt_topic_ms;
     this.mqtt_topic_app = mqtt_topic_app;
     this.icon_path = icon_path;
 
@@ -22,7 +22,7 @@ util.inherits(Adaptor, events.EventEmitter);
 
 Adaptor.prototype.set_value_for_uuid = function(uuid, value) {
     this.structure.set_value_for_uuid(uuid, value);
-    this.emit('for_mqtt', this.mqtt_topic_lox + '/' + this.device_info + '/' + uuid, value, true);
+    this.emit('for_mqtt', this.mqtt_topic_ms + '/' + this.device_info + '/' + uuid, value, true);
 };
 
 Adaptor.prototype.get_serialnr = function() {
@@ -45,8 +45,8 @@ Adaptor.prototype.get_command_from_topic = function(topic, data) {
 };
 
 Adaptor.prototype.get_topics_for_subscription = function() {
-    // topics: mqtt_topic_lox/serialnr/uuid/cmd, mqtt_topic_lox/serialnr/uuid/<subcontrol>/cmd
-    return [this.mqtt_topic_lox + '/+/+/cmd', this.mqtt_topic_lox + '/+/+/+/cmd'];
+    // topics: mqtt_topic_ms/serialnr/uuid/cmd, mqtt_topic_ms/serialnr/uuid/<subcontrol>/cmd
+    return [this.mqtt_topic_ms + '/+/+/cmd', this.mqtt_topic_ms + '/+/+/+/cmd'];
 };
 
 Adaptor.prototype.abort = function() {
@@ -75,7 +75,7 @@ Adaptor.prototype.publish_mqtt_structure = function() {
         {
             hwid: this.device_info,
             uuid: category.uuid,
-            mqtt_cmd: this.mqtt_topic_lox + '/' + mqtt_uuid + '/cmd',
+            mqtt_cmd: this.mqtt_topic_ms + '/' + mqtt_uuid + '/cmd',
             name: category.name,
             type: category.type,
             icon: { href: this.icon_path + '/' + category.image },
@@ -96,7 +96,7 @@ Adaptor.prototype.publish_mqtt_structure = function() {
         {
             hwid: this.device_info,
             uuid: room.uuid,
-            mqtt_cmd: this.mqtt_topic_lox + '/' + mqtt_uuid + '/cmd',
+            mqtt_cmd: this.mqtt_topic_ms + '/' + mqtt_uuid + '/cmd',
             name: room.name,
             type: room.type,
             icon: {
@@ -141,7 +141,7 @@ Adaptor.prototype.publish_mqtt_structure = function() {
                     {
                         uuid: control.subControls.items[key].uuidAction,
                         name: control.subControls.items[key].name,
-                        mqtt_cmd: this.mqtt_topic_lox + '/' + sub_uuid + '/cmd',
+                        mqtt_cmd: this.mqtt_topic_ms + '/' + sub_uuid + '/cmd',
                         type: control.subControls.items[key].type,
                         is_favorite: control.subControls.items[key].isFavorite,
                         is_visible: true,
@@ -154,7 +154,7 @@ Adaptor.prototype.publish_mqtt_structure = function() {
         {
             hwid: this.device_info,
             uuid: control.uuidAction,
-            mqtt_cmd: this.mqtt_topic_lox + '/' + mqtt_uuid + '/cmd',
+            mqtt_cmd: this.mqtt_topic_ms + '/' + mqtt_uuid + '/cmd',
             name: control.name,
             defaultIcon: control.defaultIcon,
             icon: { href: icon },
@@ -186,11 +186,11 @@ Adaptor.prototype._process_states = function(obj) {
             if (Array.isArray(obj.items[key].uuid)) { // handle array,
                 let list = [];
                 obj.items[key].uuid.forEach(uuid => {
-                    list.push({ mqtt: that.mqtt_topic_lox + '/' + that.device_info + '/' + uuid })});
+                    list.push({ mqtt: that.mqtt_topic_ms + '/' + that.device_info + '/' + uuid })});
                 states[camelToSnake(key)] = list;
             }
             else
-                states[camelToSnake(key)] = { mqtt: that.mqtt_topic_lox + '/' + that.device_info + '/' + obj.items[key].uuid };
+                states[camelToSnake(key)] = { mqtt: that.mqtt_topic_ms + '/' + that.device_info + '/' + obj.items[key].uuid };
         });
     }
     return states;
@@ -215,7 +215,7 @@ Adaptor.prototype._build_paths = function() {
 
 Adaptor.prototype._add_control = function(control) {
     var serialnr = this.structure.msInfo.serialNr;
-    var path = this.mqtt_topic_lox + '/' + serialnr + '/' + control.uuidAction;
+    var path = this.mqtt_topic_ms + '/' + serialnr + '/' + control.uuidAction;
     this.path2control[path] = control;
 }
 

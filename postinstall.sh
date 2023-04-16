@@ -46,13 +46,13 @@ PBIN=$LBPBIN/$PDIR
 
 PLUGINNAME=$3 # name same as installation folder
 
-echo "<INFO> Installing dependencies"
+echo "<INFO> Installing dependencies..."
 npm --prefix $PBIN install --only=production
 
-echo "<INFO> Create default configuration"
+echo "<INFO> Create default configuration..."
 node $PBIN/create_config.js
 
-echo "<INFO> Starting services"
+echo "<INFO> Starting services..."
 npm --prefix $PBIN run start
 
 exit 0;

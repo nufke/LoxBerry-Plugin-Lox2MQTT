@@ -21,8 +21,6 @@ PSBIN=$LBPSBIN/$PDIR
 PBIN=$LBPBIN/$PDIR
 
 echo "<INFO> Stop plugin..."
-npm --prefix $PBIN run stop
-npm --prefix $PBIN run delete
 npm --prefix $PBIN run kill
 
 echo "<INFO> Uninstall local Node.js packages..."

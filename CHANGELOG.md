@@ -1,5 +1,13 @@
 # Version History
 
+## v0.1.0 (BETA)
+
+ * Introduce configuration via LoxBerry plugin webpage
+ * Default configuration created at plugin install
+ * Added configuration option to disable publising Miniserver state changes
+ * When starting Lox2MQTT, check if configured Miniserver(s) exist(s)
+ * Updated readme
+
 ## v0.0.3 (ALPHA)
 
  * Supports Loxone structure and controls up to version 14.0.0 (2023.04.02)
