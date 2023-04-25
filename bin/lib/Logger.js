@@ -1,29 +1,42 @@
-const winston = require('winston');
+const format = (level, message) => `${level.toUpperCase()}: ${message}\n`;
 
-var Logger = function(config) {
-    if (!config){
-        return winston.createLogger({
-            transports: [
-                new (winston.transports.File)({
-                    timestamp: true,
-                    level: 'error',
-                })
-            ]
-        });
+const stdErr = (msg) => process.stderr.write(msg);
+const stdOut = (msg) => process.stdout.write(msg);
+
+const DEBUG = 7;
+const INFO = 6;
+const WARN = 4;
+const ERROR = 3;
+
+class Logger {
+    constructor(logLevel) {
+        this.loglevel = logLevel;
     }
 
-    var transports = [];
+    info(message) {
+        if (this.loglevel >= INFO) stdOut(format('INFO', message));
+    }
 
-    config.forEach(function(item){
-        var transport_class = Object.keys(item)[0];
-        transports.push(new (winston.transports[transport_class])(
-            item[transport_class]
-        ));
-    });
-    var logger = winston.createLogger({transports: transports});
-    logger.exitOnError = false;
+    debug(message) {
+        if (this.loglevel === DEBUG) stdOut(format('DEBUG', message));
+    }
 
-    return logger;
-};
+    warn(message) {
+        if (this.loglevel >= WARN) stdOut(format('WARN', message));
+    }
+
+    error(message, error) {
+        if (this.loglevel >= ERROR) {
+            stdErr(format('ERROR', message));
+
+            if (error) {
+                if (error.stack) {
+                    return stdErr(`    ${error.stack}\n`);
+                }
+                return stdErr(`    ${error.name}: ${error.message}\n`);
+            }
+        }
+    }
+}
 
 module.exports = Logger;

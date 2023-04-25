@@ -1,14 +1,14 @@
 const node_lox_ws_api = require("node-lox-ws-api");
 
 function _limit_string(text, limit){
-    if (text.length <= limit){
+    if (text.length <= limit) {
         return text;
     }
     return text.substr(0, limit) + '...(' + text.length + ')';
 }
 
-var WebSocketAPI = function(app, syscnf, msid) {
-    var miniserver = syscnf.Miniserver[msid];
+var WebSocketAPI = function(app, globalConfig, msid) {
+    var miniserver = globalConfig.Miniserver[msid];
     var client = new node_lox_ws_api(miniserver.Ipaddress, miniserver.Admin, miniserver.Pass, true, 'AES-256-CBC');
     var text_logger_limit = 100;
 

@@ -1,8 +1,6 @@
 const util = require('util');
 const events = require('events');
 
-var config = require("config");
-
 var Adaptor = function (structure, mqtt_topic_ms, mqtt_topic_app, icon_path) {
     this.structure = structure;
     this.mqtt_topic_ms = mqtt_topic_ms;

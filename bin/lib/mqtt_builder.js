@@ -1,9 +1,9 @@
 const mqtt = require('mqtt');
 
-var mqtt_builder = function(syscnf, app) {
+var mqtt_builder = function(globalConfig, app) {
 
-    var url = 'mqtt://' + syscnf.Mqtt.Brokerhost + ':' + syscnf.Mqtt.Brokerport;
-    var options = { username: syscnf.Mqtt.Brokeruser, password: syscnf.Mqtt.Brokerpass };
+    var url = 'mqtt://' + globalConfig.Mqtt.Brokerhost + ':' + globalConfig.Mqtt.Brokerport;
+    var options = { username: globalConfig.Mqtt.Brokeruser, password: globalConfig.Mqtt.Brokerpass };
 
     var client = mqtt.connect(url, options );
 

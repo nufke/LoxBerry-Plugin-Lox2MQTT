@@ -3,7 +3,7 @@ const events = require('events');
 
 var App = function(logger) {
 
-    process.title = 'Lox2MQTT';
+    process.title = 'Lox2MQTT'; // required to restart process at OS level
 
     var that = this;
     this.logger = logger;

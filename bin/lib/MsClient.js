@@ -5,27 +5,19 @@ const Adaptor = require("./Adaptor.js");
 const Structure = require("node-lox-structure-file");
 const MqttClient = require("./mqtt_builder.js");
 
-var MsClient = function (app, config, msid, mqtt_client) {
+var MsClient = function (app, config, globalConfig, msid, mqtt_client) {
 
-    try {
-        var syscnffile = fs.readFileSync(process.env.LBSCONFIG + '/general.json');
-        var syscnf = JSON.parse(syscnffile);
-    } catch (err) {
-        console.log(err);
-        return;
-    }
-
-    if (!syscnf.Miniserver[msid]) {
+    if (!globalConfig.Miniserver[msid]) {
         app.logger.error("Miniserver with id " + msid + " not found.");
         return;
     }
 
-    var lox_ms_client = WebSocket(app, syscnf, msid);
+    var lox_ms_client = WebSocket(app, globalConfig, msid);
     var lox_mqtt_adaptor = undefined;
 
     // Check if we already have an MQTT client, otherwise create one
     if (!mqtt_client) {
-        mqtt_client = MqttClient(syscnf, app);
+        mqtt_client = MqttClient(globalConfig, app);
     }
 
     // check configuration variables
@@ -103,7 +95,7 @@ var MsClient = function (app, config, msid, mqtt_client) {
             return;
         }
 
-        var action = lox_mqtt_adaptor.get_command_from_topic(topic, message.toString());
+        let action = lox_mqtt_adaptor.get_command_from_topic(topic, message.toString());
 
         app.logger.debug("MQTT Adaptor - for miniserver: ", { uuidAction: action.uuidAction, command: action.command });
 
@@ -113,7 +105,6 @@ var MsClient = function (app, config, msid, mqtt_client) {
             app.logger.debug("MQTT Adaptor - Miniserver in readonly mode");
         }
     });
-
 };
 
 module.exports = MsClient;
