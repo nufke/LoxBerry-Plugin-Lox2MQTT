@@ -42,6 +42,8 @@
                         <input type="checkbox" :id=`subscribe-${index}` v-model="ms.subscribe"
                             v-on:change="formadata_changed();">
                     </div>
+                    <p class="hint"><b>WARNING!</b> Publishing and subscribing to control states changes will increase the load on your Loxone Miniserver and
+                        MQTT server.</p>
                 </div>
             </fieldset>
         </div>

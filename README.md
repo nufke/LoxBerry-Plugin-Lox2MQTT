@@ -28,7 +28,9 @@ Use the LoxBerry plugin webpage to configure communication with MQTT. The plugin
 
 When saving the configuration, the Lox2MQTT plugin will be restarted automatically. The process status of the Lox2MQTT plugin is shown at the bottom of the configuration page.
 
-NOTE: The configuration settings for the LoxBerry App are optional, as the LoxBeryy App plugin is not yet released.
+**WARNING!** Publishing and subscribing to control states changes will increase the load on your Loxone Miniserver(s) and MQTT server.
+
+*NOTE: The configuration settings for the LoxBerry App are optional, as the LoxBeryy App plugin is not yet released.*
 
 ## Miniserver to MQTT Broadcast
 
