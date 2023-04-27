@@ -1,5 +1,13 @@
 # Version History
 
+## v0.2.0 (BETA)
+
+ * winston logger replaced by custom logger via pm2 (thanks to [@LoxYourLife](https://github.com/LoxYourLife))
+ * Use LoxBerry loglevel from the plugin settings
+ * Add webpage config navigation bar including link to logfile
+ * Add warning message in webpage config for publishing and subscribing to MQTT
+ * General code cleanup
+
 ## v0.1.0 (BETA)
 
  * Introduce configuration via LoxBerry plugin webpage
