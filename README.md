@@ -89,3 +89,9 @@ A: Yes, you can send MQTT messages which are converted to commands for the Loxon
 ## Issues and questions
 
 Please submit your issues and questions via the GitHub issue tracker: https://github.com/nufke/LoxBerry-Plugin-Lox2MQTT/issues or use https://www.loxforum.com
+
+## Credits
+
+This plugin uses portions of the [Node.js Loxone WebSocket API](https://github.com/alladdin/node-lox-ws-api) created by [Ladislav Dokulil](https://github.com/alladdin)
+
+The logging capabilites are based on the [LoxBerry message-center plugin](https://github.com/LoxYourLife/message-center) developed by [LoxYourLife](https://github.com/LoxYourLife)

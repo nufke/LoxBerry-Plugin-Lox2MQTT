@@ -3,14 +3,15 @@
   "version": "0.1.0",
   "description": "Loxone Miniserver communicating with MQTT server",
   "main": "lox2mqtt.js",
-  "bin": {
-    "lox-mqtt": "bin/lox2mqtt.js"
+  "directories": {
+    "lib": "lib"
   },
   "scripts": {
-    "start": "PM2_HOME=$(pwd)/.pm2 pm2 start lox2mqtt.js",
-    "restart": "PM2_HOME=$(pwd)/.pm2 pm2 restart lox2mqtt.js",
-    "stop": "PM2_HOME=$(pwd)/.pm2 pm2 stop lox2mqtt.js",
-    "delete": "PM2_HOME=$(pwd)/.pm2 pm2 delete lox2mqtt.js",
+    "dev": "node lox2mqtt.js",
+    "start": "PM2_HOME=$(pwd)/.pm2 pm2 start lox2mqtt.config.js",
+    "restart": "PM2_HOME=$(pwd)/.pm2 pm2 restart lox2mqtt.config.js",
+    "stop": "PM2_HOME=$(pwd)/.pm2 pm2 stop lox2mqtt.config.js",
+    "delete": "PM2_HOME=$(pwd)/.pm2 pm2 delete lox2mqtt.config.js",
     "kill": "PM2_HOME=$(pwd)/.pm2 pm2 kill",
     "list": "PM2_HOME=$(pwd)/.pm2 pm2 list",
     "status": "PM2_HOME=$(pwd)/.pm2 pm2 status"
