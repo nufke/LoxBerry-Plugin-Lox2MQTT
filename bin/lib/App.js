@@ -28,9 +28,8 @@ App.prototype.exit = function(code, message) {
   var that = this;
   this.emit('exit', code);
 
-  process.on('exit', function(code) {
-    that.logger.info('Lox2MQTT stopped - ' + message);
-  })
+  that.logger.info('Lox2MQTT exit - ' + message);
+  that.logger.closeLog();
 };
 
 module.exports = App;

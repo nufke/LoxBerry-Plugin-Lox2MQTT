@@ -5,7 +5,8 @@ const directories = () => {
     data: '/opt/loxberry/data/plugins/lox2mqtt',
     logdir: '/opt/loxberry/log/plugins/lox2mqtt',
     homedir: '/opt/loxberry',
-    systemData: '/opt/loxberry/data/system'
+    systemData: '/opt/loxberry/data/system',
+    syslogdir: '/opt/loxberry/log/system_tmpfs'
   };
 }
 

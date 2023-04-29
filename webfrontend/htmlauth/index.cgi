@@ -3,7 +3,12 @@ use warnings;
 use strict;
 use LoxBerry::System;
 use LoxBerry::Web;
+use CGI;
+use warnings;
+use strict;
+my $load="";
 
+# Variables
 my $plugintitle = "Lox2MQTT";
 my $helplink = "https://wiki.loxberry.de/plugins/lox2mqtt/start";
 my $helptemplate = "help.html";
@@ -16,20 +21,45 @@ my $template = HTML::Template->new(
     die_on_bad_params => 0,
 );
 
+# Parameters
+# Import form parameters to the namespace R
+my $cgi = CGI->new;
+$cgi->import_names('R');
+# Example: Parameter lang is now $R::lang
+$load = $R::load if $R::load;
+
 # Navbar
 our %navbar;
 $navbar{1}{Name} = "Settings";
 $navbar{1}{URL} = "index.cgi";
-$navbar{99}{Name} = "Logfile";
-$navbar{99}{URL} = "/admin/system/tools/logfile.cgi?logfile=".$lbplogdir."/lox2mqtt.log&header=html&format=template&only=once";
-$navbar{1}{active} = 1;
+$navbar{99}{Name} = "Logfiles";
+$navbar{99}{URL} = "index.cgi?load=2";
 
-# Template Vars and Form parts
-$template->param("LBPPLUGINDIR", $lbpplugindir);
-
-# Template
-LoxBerry::Web::lbheader($plugintitle, $helplink, $helptemplate);
-print $template->output();
-LoxBerry::Web::lbfooter();
+# Menu
+if (!$R::saveformdata && $load eq "2") {
+  $navbar{99}{active} = 1;
+  &form;
+} elsif (!$R::saveformdata) {
+  $navbar{1}{active} = 1;
+  &form;
+} else {
+  &save;
+}
 
 exit;
+
+# Form / menu
+sub form {
+  if ($load eq "2") {
+    $template->param( "FORM2", 1);
+    $template->param('loglist_html', LoxBerry::Web::loglist_html( PACKAGE => 'lox2mqtt' ))
+  } else {
+    $template->param( "FORM1", 1);
+  }
+
+  # Print Template
+  LoxBerry::Web::lbheader($plugintitle, $helplink, $helptemplate);
+  print $template->output();
+  LoxBerry::Web::lbfooter();
+  exit;
+}

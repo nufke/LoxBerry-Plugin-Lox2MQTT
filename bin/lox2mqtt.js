@@ -2,13 +2,15 @@
 
 const _ = require('lodash');
 const directories = require('./lib/directories');
-const Logger = require('./lib/Logger');
+const Logger = require('loxberry-logger');
 const App = require('./lib/App');
 const MsClient = require('./lib/MsClient');
 
 const configFile = `${directories.config}/default.json`;
+const logFile = `${directories.logdir}/lox2mqtt.log`;
 const globalConfigFile = `${directories.homedir}/config/system/general.json`;
 const globalPluginDbFile = `${directories.systemData}/plugindatabase.json`;
+const syslogDbFile = `${directories.syslogdir}/logs_sqlite.dat`;
 
 const getPluginLogLevel = () => {
   let globalPluginDb = require(globalPluginDbFile);
@@ -21,7 +23,7 @@ const main = () => {
   let config = require(configFile);
   let globalConfig = require(globalConfigFile);
   let logLevel = getPluginLogLevel();
-  const logger = new Logger(logLevel);
+  const logger = new Logger(syslogDbFile, 'lox2mqtt', 'Lox2MQTT', logFile, logLevel);
 
   let app = new App(logger);
   let mqtt_client = undefined;

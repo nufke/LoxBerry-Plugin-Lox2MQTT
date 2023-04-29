@@ -12,28 +12,28 @@ var mqtt_builder = function(globalConfig, app) {
   });
 
   client.on('connect', function(connack) {
-    app.logger.info("MQTT - connect", connack);
+    app.logger.info("MQTT Client - connect", connack);
   });
 
   client.on('reconnect', function() {
-    app.logger.debug("MQTT - reconnect");
+    app.logger.debug("MQTT Client - reconnect");
   });
 
   client.on('close', function() {
-    app.logger.info("MQTT - close");
+    app.logger.info("MQTT Client - close");
   });
 
   client.on('offline', function() {
-    app.logger.info("MQTT - offline");
+    app.logger.info("MQTT Client - offline");
   });
 
   client.on('error', function(error) {
-    app.logger.error("MQTT - error: " + error);
+    app.logger.error("MQTT Client - error: " + error);
     app.exit(1, error);
   });
 
   client.on('message', function(topic, message, packet) {
-    app.logger.debug("MQTT - message: ", { topic: topic, message: message, packet: packet });
+    app.logger.debug("MQTT Client - message: ", { topic: topic, message: message, packet: packet });
   });
 
   return client;

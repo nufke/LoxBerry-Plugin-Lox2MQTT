@@ -1,5 +1,11 @@
 # Version History
 
+## v0.2.1 (BETA)
+
+ * custom logger replaced by [loxberry-logger](https://github.com/nufke/loxberry-logger)
+ * logfile subpage now available via navigation bar in plugin configuration page
+ * fix ARCHIVEURL and INFOURL for plugin updates using [release.cfg](release.cfg)
+
 ## v0.2.0 (BETA)
 
  * winston logger replaced by custom logger via pm2 (thanks to [@LoxYourLife](https://github.com/LoxYourLife))

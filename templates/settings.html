@@ -1,97 +1,100 @@
-<div id="lox2mqttapp">
-  <p class="wide">{{sl.heading}}</p>
-  <p v-html="sl.intro"></p>
+<TMPL_IF form1>
+  <div id="lox2mqttapp">
+    <p class="wide">{{sl.heading}}</p>
+    <p v-html="sl.intro"></p>
 
-  <h3>Miniserver(s) configuration</h3>
+    <h3>Miniserver(s) configuration</h3>
 
-  <p>This section lists the available Miniservers. Miniserver not listed? Configure your Miniservers <a
-      href="/admin/system/miniserver.cgi">here</a>.</p>
-  <div id="vforid" v-for="(ms, index) in config.miniserver">
-    <h3>Miniserver {{index}}</h3>
+    <p>This section lists the available Miniservers. Miniserver not listed? Configure your Miniservers <a
+        href="/admin/system/miniserver.cgi">here</a>.</p>
+    <div id="vforid" v-for="(ms, index) in config.miniserver">
+      <h3>Miniserver {{index}}</h3>
 
-    <div class="ui-field-contain">
-      <label for="ms.mqtt_topic_ms" class="col-fixed" style="min-width:15%">Miniserver topic name</label>
-      <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
-        <input type="text" style="width:50%" id="ms.mqtt_topic_ms" v-model.trim="ms.mqtt_topic_ms"
-          v-on:change="formadata_changed()">
-      </div>
-    </div>
-    <div class="ui-field-contain">
-      <fieldset class="ui-controlgroup ui-controlgroup-vertical ui-corner-all" data-role="controlgroup">
-        <div class="ui-controlgroup-label" role="heading">
-          <legend>Options</legend>
+      <div class="ui-field-contain">
+        <label for="ms.mqtt_topic_ms" class="col-fixed" style="min-width:15%">Miniserver topic name</label>
+        <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
+          <input type="text" style="width:50%" id="ms.mqtt_topic_ms" v-model.trim="ms.mqtt_topic_ms"
+            v-on:change="formadata_changed()">
         </div>
-        <div class="ui-controlgroup-controls">
-          <div class="ui-checkbox">
-            <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-first-child"
-              :class="{ 'ui-checkbox-on': ms.publish_structure==true, 'ui-checkbox-off': ms.publish_structure==false }"
-              :for=`publish_structure-${index}`>Publish structure</label>
-            <input type="checkbox" :id=`publish_structure-${index}` v-model="ms.publish_structure"
-              v-on:change="formadata_changed();">
+      </div>
+      <div class="ui-field-contain">
+        <fieldset class="ui-controlgroup ui-controlgroup-vertical ui-corner-all" data-role="controlgroup">
+          <div class="ui-controlgroup-label" role="heading">
+            <legend>Options</legend>
           </div>
-          <div class="ui-checkbox">
-            <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left"
-              :class="{ 'ui-checkbox-on': ms.publish_states==true, 'ui-checkbox-off': ms.publish_states==false }"
-              :for=`publish_states-${index}`>Publish control states</label>
-            <input type="checkbox" :id=`publish_states-${index}` v-model="ms.publish_states"
-              v-on:change="formadata_changed();">
+          <div class="ui-controlgroup-controls">
+            <div class="ui-checkbox">
+              <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-first-child"
+                :class="{ 'ui-checkbox-on': ms.publish_structure==true, 'ui-checkbox-off': ms.publish_structure==false }"
+                :for=`publish_structure-${index}`>Publish structure</label>
+              <input type="checkbox" :id=`publish_structure-${index}` v-model="ms.publish_structure"
+                v-on:change="formadata_changed();">
+            </div>
+            <div class="ui-checkbox">
+              <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left"
+                :class="{ 'ui-checkbox-on': ms.publish_states==true, 'ui-checkbox-off': ms.publish_states==false }"
+                :for=`publish_states-${index}`>Publish control states</label>
+              <input type="checkbox" :id=`publish_states-${index}` v-model="ms.publish_states"
+                v-on:change="formadata_changed();">
+            </div>
+            <div class="ui-checkbox">
+              <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-last-child"
+                :class="{ 'ui-checkbox-on': ms.subscribe==true, 'ui-checkbox-off': ms.subscribe==false }"
+                :for=`subscribe-${index}`>Subscribe to MQTT</label>
+              <input type="checkbox" :id=`subscribe-${index}` v-model="ms.subscribe" v-on:change="formadata_changed();">
+            </div>
+            <p class="hint"><b>WARNING!</b> Publishing and subscribing to control states changes will increase the load
+              on
+              your Loxone Miniserver and MQTT server.</p>
           </div>
-          <div class="ui-checkbox">
-            <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-last-child"
-              :class="{ 'ui-checkbox-on': ms.subscribe==true, 'ui-checkbox-off': ms.subscribe==false }"
-              :for=`subscribe-${index}`>Subscribe to MQTT</label>
-            <input type="checkbox" :id=`subscribe-${index}` v-model="ms.subscribe" v-on:change="formadata_changed();">
-          </div>
-          <p class="hint"><b>WARNING!</b> Publishing and subscribing to control states changes will increase the load on
-            your Loxone Miniserver and MQTT server.</p>
+        </fieldset>
+      </div>
+      <div v-if="ms.publish_structure" class="ui-field-contain">
+        <label :for=`mqtt_topic_app-${index}` class="col-fixed" style="min-width:15%">LoxBerry App topic
+          name</label>
+        <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
+          <input type="text" style="width:50%" :id=`mqtt_topic_app-${index}` v-model.trim="ms.mqtt_topic_app"
+            v-on:change="formadata_changed()">
         </div>
-      </fieldset>
-    </div>
-    <div v-if="ms.publish_structure" class="ui-field-contain">
-      <label :for=`mqtt_topic_app-${index}` class="col-fixed" style="min-width:15%">LoxBerry App topic
-        name</label>
-      <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
-        <input type="text" style="width:50%" :id=`mqtt_topic_app-${index}` v-model.trim="ms.mqtt_topic_app"
-          v-on:change="formadata_changed()">
       </div>
-    </div>
-    <div v-if="ms.publish_structure" class="ui-field-contain">
-      <label :for=`icon_path-${index}` class="col-fixed" style="min-width:15%">LoxBerry App icon path</label>
-      <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
-        <input type="text" style="width:50%" :id=`icon_path-${index}` v-model.trim="ms.icon_path"
-          v-on:change="formadata_changed()">
+      <div v-if="ms.publish_structure" class="ui-field-contain">
+        <label :for=`icon_path-${index}` class="col-fixed" style="min-width:15%">LoxBerry App icon path</label>
+        <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
+          <input type="text" style="width:50%" :id=`icon_path-${index}` v-model.trim="ms.icon_path"
+            v-on:change="formadata_changed()">
+        </div>
       </div>
+
     </div>
 
+    <div style="height:15px"></div>
+
+    <!-- Save and Apply button -->
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <button :disabled='btn_disabled' class="ui-btn ui-btn-icon-right" data-inline="true" v-on:click="saveApply()">Save
+        and Apply</button>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:center;font-size:70%;padding:5px 20px 5px 20px">
+      <p style="color:green" v-if="pid != null">Lox2MQTT running, PID: {{pid}}</p>
+      <p style="color:red" v-else>Lox2MQTT not running</p>
+
+    </div>
+
+    <div v-show="data_changed" style="color:blue">
+      Unsaved changes.<br>Keep in mind, that changing the Lox2MQTT settings might impact the communcation between
+      the Loxone Miniserver and MQTT devices. Some MQTT related plugins might need to be restarted.
+    </div>
+
+    <div v-show="data_saved" style="color:green">
+      Changes saved successfully.
+    </div>
+
+    <div v-show="data_save_error" style="color:red">
+      Error saving data.
+    </div>
   </div>
-
-  <div style="height:15px"></div>
-
-  <!-- Save and Apply button -->
-  <div style="display:flex;align-items:center;justify-content:center;">
-    <button :disabled='btn_disabled' class="ui-btn ui-btn-icon-right" data-inline="true" v-on:click="saveApply()">Save
-      and Apply</button>
-  </div>
-
-  <div style="display:flex;align-items:center;justify-content:center;font-size:70%;padding:5px 20px 5px 20px">
-    <p style="color:green" v-if="pid != null">Lox2MQTT running, PID: {{pid}}</p>
-    <p style="color:red" v-else>Lox2MQTT not running</p>
-
-  </div>
-
-  <div v-show="data_changed" style="color:blue">
-    Unsaved changes.<br>Keep in mind, that changing the Lox2MQTT settings might impact the communcation between
-    the Loxone Miniserver and MQTT devices. Some MQTT related plugins might need to be restarted.
-  </div>
-
-  <div v-show="data_saved" style="color:green">
-    Changes saved successfully.
-  </div>
-
-  <div v-show="data_save_error" style="color:red">
-    Error saving data.
-  </div>
-</div>
+</TMPL_IF>
 
 <script>
   const generic = '/admin/system/ajax/ajax-generic.php';
@@ -133,7 +136,7 @@
         var self = this;
         // Update default.json of the plugin
         fetch(generic + '?file=LBPCONFIG/lox2mqtt/default.json&write', requestOptions)
-          .then(function(response) {
+          .then(function (response) {
             if (response.ok != true) {
               self.data_save_error = true;
             }
@@ -181,3 +184,8 @@
     .mount('#lox2mqttapp')
 
 </script>
+
+<TMPL_IF form2>
+  <div class="wide">Logfiles</div>
+  <TMPL_VAR loglist_html>
+</TMPL_IF>
