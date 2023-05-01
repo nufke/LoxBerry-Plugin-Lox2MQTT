@@ -1,5 +1,10 @@
 # Version History
 
+## v0.2.2 (BETA)
+
+ * support multiple log sessions per logger via [loxberry-logger](https://github.com/nufke/loxberry-logger)
+ * fix: plugin upgrade will restore log and config files
+
 ## v0.2.1 (BETA)
 
  * custom logger replaced by [loxberry-logger](https://github.com/nufke/loxberry-logger)

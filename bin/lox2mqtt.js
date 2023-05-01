@@ -23,9 +23,9 @@ const main = () => {
   let config = require(configFile);
   let globalConfig = require(globalConfigFile);
   let logLevel = getPluginLogLevel();
-  const logger = new Logger(syslogDbFile, 'lox2mqtt', 'Lox2MQTT', logFile, logLevel);
+  const logger = new Logger(syslogDbFile, logLevel);
 
-  let app = new App(logger);
+  let app = new App(logger, logFile);
   let mqtt_client = undefined;
   let ms_client = {}
 

@@ -20,17 +20,15 @@ PCONFIG=$LBPCONFIG/$PDIR
 PSBIN=$LBPSBIN/$PDIR
 PBIN=$LBPBIN/$PDIR
 
-echo "<INFO> Creating temporary folders for upgrading..."
-mkdir -p /tmp/$PTEMPDIR\_upgrade
-mkdir -p /tmp/$PTEMPDIR\_upgrade/log
-mkdir -p /tmp/$PTEMPDIR\_upgrade/config
+echo "<INFO> Copy back existing config and log files..."
+cp -p -v -r /tmp/$PTEMPDIR\_upgrade/log/$PDIR/* $PLOG
+cp -p -v -r /tmp/$PTEMPDIR\_upgrade/config/$PDIR/* $PCONFIG
 
-echo "<INFO> Backing up existing config and log files..."
-cp -p -v -r $PLOG /tmp/$PTEMPDIR\_upgrade/log
-cp -p -v -r $PCONFIG /tmp/$PTEMPDIR\_upgrade/config
-
-echo "<INFO> Stop plugin..."
-npm --prefix $PBIN run kill
+echo "<INFO> Remove temporary folders"
+rm -r /tmp/$PTEMPDIR\_upgrade/log
+rm -r /tmp/$PTEMPDIR\_upgrade/config
+rm -r /tmp/$PTEMPDIR\_upgrade
 
 # Exit with Status 0
 exit 0
+
