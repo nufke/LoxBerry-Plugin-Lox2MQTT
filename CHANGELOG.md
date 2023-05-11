@@ -1,5 +1,12 @@
 # Version History
 
+## v0.2.3 (BETA)
+
+ * fix: Miniserver login using unencoded username and password
+ * fix: support user-defined Miniserver port
+ * improved reporting in case of a missing plugin configuration file
+ * deamon process manager (pm2) should not autorestart the program when exiting
+
 ## v0.2.2 (BETA)
 
  * support multiple log sessions per logger via [loxberry-logger](https://github.com/nufke/loxberry-logger)

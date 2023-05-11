@@ -25,6 +25,11 @@ const main = () => {
   let logLevel = getPluginLogLevel();
   const logger = new Logger(syslogDbFile, logLevel);
 
+  if (!config.miniserver) {
+    logger.info("Lox2MQTT - Missing or illegal configuration. Reinstall the plugin or report this issue.");
+    return;
+  }
+
   let app = new App(logger, logFile);
   let mqtt_client = undefined;
   let ms_client = {}
@@ -36,4 +41,3 @@ const main = () => {
 };
 
 main();
-
