@@ -9,8 +9,8 @@ function _limit_string(text, limit) {
 
 var WebSocketAPI = function(app, globalConfig, msid) {
   var miniserver = globalConfig.Miniserver[msid];
-  var host = miniserver.Ipaddress + ":" + (miniserver.Preferhttps ? miniserver.Porthttps : miniserver.Port);
-  var client = new node_lox_ws_api(host, miniserver.Admin_raw, miniserver.Pass_raw, true, 'AES-256-CBC');
+  var host = miniserver.Ipaddress + ":" + ((miniserver.Preferhttps==='true') ? miniserver.Porthttps : miniserver.Port);
+  var client = new node_lox_ws_api(host, miniserver.Admin_raw, miniserver.Pass_raw, true, 'Token-Enc');
   var text_logger_limit = 100;
 
   app.on('exit', function(code) {
