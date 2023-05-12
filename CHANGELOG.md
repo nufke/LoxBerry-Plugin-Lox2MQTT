@@ -1,5 +1,10 @@
 # Version History
 
+## v0.2.4 (BETA)
+
+ * fix: Use Miniserver token-based authentication
+ * fix: Detect use of Miniserver https port
+
 ## v0.2.3 (BETA)
 
  * fix: Miniserver login using unencoded username and password
