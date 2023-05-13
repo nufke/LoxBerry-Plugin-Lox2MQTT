@@ -8,15 +8,15 @@ const MsClient = require('./lib/MsClient');
 
 const configFile = `${directories.config}/default.json`;
 const logFile = `${directories.logdir}/lox2mqtt.log`;
-const globalConfigFile = `${directories.homedir}/config/system/general.json`;
-const globalPluginDbFile = `${directories.systemData}/plugindatabase.json`;
+const globalConfigFile = `${directories.system_config}/general.json`;
+const globalPluginDbFile = `${directories.system_data}/plugindatabase.json`;
 const syslogDbFile = `${directories.syslogdir}/logs_sqlite.dat`;
 
 const getPluginLogLevel = () => {
   let globalPluginDb = require(globalPluginDbFile);
   const pluginData = _.find(globalPluginDb.plugins, (entry) => entry.name === 'lox2mqtt');
   if (_.isUndefined(pluginData)) return 3; // not defined defaults to ERROR level
-  return pluginData.loglevel;
+  return Number(pluginData.loglevel);
 };
 
 const main = () => {

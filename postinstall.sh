@@ -50,7 +50,7 @@ echo "<INFO> Installing dependencies..."
 npm --prefix $PBIN install --only=production
 
 echo "<INFO> Create default configuration..."
-node $PBIN/create_config.js
+node $PBIN/update_config.js
 
 echo "<INFO> Starting services..."
 npm --prefix $PBIN run start

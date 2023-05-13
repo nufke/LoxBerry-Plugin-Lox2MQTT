@@ -16,17 +16,21 @@ Use the LoxBerry plugin webpage to configure communication with MQTT. The plugin
 
   * **Options**:
 
+    * **Use other Miniserver login credentials**: Connect to the Miniserver as a different user (default: false)
+
     * **Publish structure**: at plugin startup, the Miniserver structure is published (default: false)
 
     * **Publish control states**: the Miniserver controls state changes are published (default: false)
 
     * **Subscribe to MQTT**: the Miniserver will listen to MQTT and control commands made over MQTT will control the Miniserver (default: false)
 
-  * **LoxBerry App topic name**: MQTT topic name used when publising the Miniserver structure over MQTT (default: loxberry/app)
+  * **Miniserver username**: Miniserver username (if enabled, default: empty)
 
-  * **LoxBerry App icon path**: Relative path to the LoxBerry App icons (default: /assets/icons/svg)
+  * **Miniserver password**: Miniserver password (if enabled, default: empty)
 
-When saving the configuration, the Lox2MQTT plugin will be restarted automatically. The process status of the Lox2MQTT plugin is shown at the bottom of the configuration page.
+  * **LoxBerry App topic name**: If enabled: MQTT topic name used when publising the Miniserver structure over MQTT (if enabled, default: loxberry/app)
+
+When saving the configuration, the Lox2MQTT plugin will be restarted automatically. Updates to the general Miniserver settings or plugin logging level will also restart this plugin. The process status of the Lox2MQTT plugin is shown at the bottom of the configuration page. Also
 
 **WARNING!** Publishing and subscribing to control state changes will increase the load on your Loxone Miniserver(s) and MQTT server.
 

@@ -7,10 +7,14 @@ function _limit_string(text, limit) {
   return text.substr(0, limit) + '...(' + text.length + ')';
 }
 
-var WebSocketAPI = function(app, globalConfig, msid) {
+var WebSocketAPI = function(app, config, globalConfig, msid) {
   var miniserver = globalConfig.Miniserver[msid];
-  var host = miniserver.Ipaddress + ":" + ((miniserver.Preferhttps==='true') ? miniserver.Porthttps : miniserver.Port);
-  var client = new node_lox_ws_api(host, miniserver.Admin_raw, miniserver.Pass_raw, true, 'Token-Enc');
+  var host = miniserver.Ipaddress + ":" + ((miniserver.Preferhttps==='1') ? miniserver.Porthttps : miniserver.Port);
+  const user = config.miniserver[msid].other_user ? config.miniserver[msid].user : miniserver.Admin_raw;
+  const pass = config.miniserver[msid].other_user ? config.miniserver[msid].pass : miniserver.Pass_raw;
+
+  app.logger.info("WebSocketAPI " + host + " - try to connect to Miniserver as user " + user + "...");
+  var client = new node_lox_ws_api(host, user, pass, true, 'Token-Enc');
   var text_logger_limit = 100;
 
   app.on('exit', function(code) {
@@ -58,7 +62,7 @@ var WebSocketAPI = function(app, globalConfig, msid) {
       default:
         data.text = _limit_string(message.data, text_logger_limit);
     }
-    app.logger.debug("WebSocketAPI " + host + " - received text message: ", data);
+    app.logger.debug("WebSocketAPI " + host + " - received text message: " + JSON.stringify(data));
   });
 
   client.on('message_file', function(message) {
@@ -76,7 +80,7 @@ var WebSocketAPI = function(app, globalConfig, msid) {
       default:
         data.text = _limit_string(message.data, text_logger_limit);
     }
-    app.logger.debug("WebSocketAPI " + host + " - received file: ", data);
+    app.logger.debug("WebSocketAPI " + host + " - received file: " + JSON.stringify(data));
   });
 
   function _update_event(uuid, evt) {
@@ -84,7 +88,7 @@ var WebSocketAPI = function(app, globalConfig, msid) {
       uuid: uuid,
       'event': _limit_string(JSON.stringify(evt), text_logger_limit),
     };
-    app.logger.debug("WebSocketAPI " + host + " - received update event: ", data);
+    app.logger.debug("WebSocketAPI " + host + " - received update event: " + JSON.stringify(data));
   }
 
   client.on('update_event_value', _update_event);
@@ -101,15 +105,15 @@ var WebSocketAPI = function(app, globalConfig, msid) {
   });
 
   client.on('message_header', function(header) {
-    app.logger.debug("WebSocketAPI " + host + " - received message header (" + header.next_state() + "):", header);
+    app.logger.debug("WebSocketAPI " + host + " - received message header (" + header.next_state() + "): "+ JSON.stringify(header));
   });
 
   client.on('message_event_table_values', function(messages) {
-    app.logger.debug("WebSocketAPI " + host + " - received value messages:", messages.length);
+    app.logger.debug("WebSocketAPI " + host + " - received value messages: " + messages.length);
   });
 
   client.on('message_event_table_text', function(messages) {
-    app.logger.debug("WebSocketAPI " + host + "- received text messages:", messages.length);
+    app.logger.debug("WebSocketAPI " + host + "- received text messages: " + messages.length);
   });
 
   client.on('get_structure_file', function(data) {

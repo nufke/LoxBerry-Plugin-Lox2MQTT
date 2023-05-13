@@ -29,6 +29,9 @@ rm -r /tmp/$PTEMPDIR\_upgrade/log
 rm -r /tmp/$PTEMPDIR\_upgrade/config
 rm -r /tmp/$PTEMPDIR\_upgrade
 
+echo "<INFO> Check and Update configuration..."
+node $PBIN/update_config.js
+
 # Exit with Status 0
 exit 0
 

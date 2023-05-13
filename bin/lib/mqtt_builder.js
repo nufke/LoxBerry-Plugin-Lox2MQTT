@@ -12,7 +12,7 @@ var mqtt_builder = function(globalConfig, app) {
   });
 
   client.on('connect', function(connack) {
-    app.logger.info("MQTT Client - connect", connack);
+    app.logger.info("MQTT Client - connect: " + JSON.stringify(connack));
   });
 
   client.on('reconnect', function() {
@@ -33,7 +33,7 @@ var mqtt_builder = function(globalConfig, app) {
   });
 
   client.on('message', function(topic, message, packet) {
-    app.logger.debug("MQTT Client - message: ", { topic: topic, message: message, packet: packet });
+    app.logger.debug("MQTT Client - topic: " + topic + ", message: " + message);
   });
 
   return client;

@@ -1,5 +1,16 @@
 # Version History
 
+## v0.3.0 (BETA)
+
+ * fix: Debug logger shows content, update [loxberry-logger](https://github.com/nufke/loxberry-logger)
+ * fix: Detect use of Miniserver https port
+ * remove LoxBerry App icon settings from configuration
+ * publish native Miniserver structure
+ * restart plugin after system or plugin configuration changes
+ * configuration option to use different Miniserver login credentials
+ * check and update configuration after upgrade
+ * Updated documentation/readme
+
 ## v0.2.4 (BETA)
 
  * fix: Use Miniserver token-based authentication

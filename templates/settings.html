@@ -26,6 +26,13 @@
             <div class="ui-controlgroup-controls">
               <div class="ui-checkbox">
                 <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-first-child"
+                  :class="{ 'ui-checkbox-on': ms.other_user==true, 'ui-checkbox-off': ms.other_user==false }"
+                  :for=`other_user-${index}`>Use other Miniserver login credentials</label>
+                <input type="checkbox" :id=`other_user-${index}` v-model="ms.other_user"
+                  v-on:change="formadata_changed();">
+              </div>
+              <div class="ui-checkbox">
+                <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left"
                   :class="{ 'ui-checkbox-on': ms.publish_structure==true, 'ui-checkbox-off': ms.publish_structure==false }"
                   :for=`publish_structure-${index}`>Publish structure</label>
                 <input type="checkbox" :id=`publish_structure-${index}` v-model="ms.publish_structure"
@@ -46,28 +53,35 @@
                   v-on:change="formadata_changed();">
               </div>
               <p class="hint"><b>WARNING!</b> Publishing and subscribing to control states changes will increase the
-                load
-                on
-                your Loxone Miniserver and MQTT server.</p>
+                load on your Loxone Miniserver and MQTT server.</p>
             </div>
           </fieldset>
         </div>
+        <div v-if="ms.other_user">
+          <div class="ui-field-contain">
+            <label :for=`user-${index}` class="col-fixed" style="min-width:15%">Miniserver username</label>
+            <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
+              <input type="text" required style="width:50%" :id=`user-${index}` v-model.trim="ms.user"
+                v-on:change="formadata_changed()">
+            </div>
+          </div>
+          <div class="ui-field-contain">
+            <label :for=`pass-${index}` class="col-fixed" style="min-width:15%">Miniserver password</label>
+            <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
+              <input type="password" required style="width:50%" :id=`pass-${index}` v-model.trim="ms.pass"
+                v-on:change="formadata_changed()">
+            </div>
+          </div>
+        </div> <!-- v-if ms.other_user -->
         <div v-if="ms.publish_structure" class="ui-field-contain">
           <label :for=`mqtt_topic_app-${index}` class="col-fixed" style="min-width:15%">LoxBerry App topic
             name</label>
           <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
-            <input type="text" style="width:50%" :id=`mqtt_topic_app-${index}` v-model.trim="ms.mqtt_topic_app"
+            <input type="text" required style="width:50%" :id=`mqtt_topic_app-${index}` v-model.trim="ms.mqtt_topic_app"
               v-on:change="formadata_changed()">
           </div>
         </div>
-        <div v-if="ms.publish_structure" class="ui-field-contain">
-          <label :for=`icon_path-${index}` class="col-fixed" style="min-width:15%">LoxBerry App icon path</label>
-          <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
-            <input type="text" style="width:50%" :id=`icon_path-${index}` v-model.trim="ms.icon_path"
-              v-on:change="formadata_changed()">
-          </div>
-        </div>
-      </div> <!--  v-for -->
+      </div> <!-- v-for -->
 
       <div style="height:15px"></div>
 
@@ -81,12 +95,10 @@
       <div style="display:flex;align-items:center;justify-content:center;font-size:70%;padding:5px 20px 5px 20px">
         <p style="color:green" v-if="pid != null">Lox2MQTT running, PID: {{pid}}</p>
         <p style="color:red" v-else>Lox2MQTT not running</p>
-
       </div>
 
       <div v-show="data_changed" style="color:blue">
-        Unsaved changes.<br>Keep in mind, that changing the Lox2MQTT settings might impact the communcation between
-        the Loxone Miniserver and MQTT devices. Some MQTT related plugins might need to be restarted.
+        Unsaved changes. Click 'Save and Apply' to restart the plugin using the new settings.
       </div>
 
       <div v-show="data_saved" style="color:green">
@@ -119,7 +131,7 @@
             "and the LoxBerry MQTT Gateway and publishes Miniserver state changes over MQTT. Furthermore, specific commands can be send " +
             "over MQTT to control the Miniserver directly."
         },
-        config: { miniserver: {}, logging: {} },
+        config: { miniserver: {} },
         data_changed: false,
         data_saved: false,
         data_save_error: false,
@@ -148,7 +160,8 @@
               self.data_save_error = true;
             }
             else {
-              fetch('/admin/plugins/lox2mqtt/ajax/ajax-lox2mqtt-handler.php?ajax=restart_lox2mqtt');
+              //ajax restart not required anymore, replaced my pm2 watch
+              //fetch('/admin/plugins/lox2mqtt/ajax/ajax-lox2mqtt-handler.php?ajax=restart_lox2mqtt');
               self.data_save_error = false;
               self.data_saved = true;
               self.data_changed = false;
@@ -180,7 +193,6 @@
             return response.json();
           })
           .then(data => {
-            console.log("pid:", data);
             this.pid = data;
           });
       }

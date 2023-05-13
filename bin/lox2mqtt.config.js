@@ -14,7 +14,11 @@ module.exports = [
     pid_file: path.resolve(directories.logdir, 'lox2mqtt.pid'),
     log_date_format: 'YYYY-MM-DD HH:mm Z',
     time: true,
-    watch: false,
+    watch: [
+      directories.config,
+      path.resolve(directories.system_config, 'general.json'),
+      path.resolve(directories.system_data, 'plugindatabase.json'),
+    ],
     autorestart: false
   }
 ];

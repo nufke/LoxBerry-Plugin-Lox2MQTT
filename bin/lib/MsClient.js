@@ -12,7 +12,7 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
     return;
   }
 
-  var lox_ms_client = WebSocket(app, globalConfig, msid);
+  var lox_ms_client = WebSocket(app, config, globalConfig, msid);
   var lox_mqtt_adaptor = undefined;
 
   // Check if we already have an MQTT client, otherwise create one
@@ -65,7 +65,7 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
       if (config.miniserver[msid].publish_states) {
         let payload = String(data);
         let options = { retain: retain_ };
-        app.logger.debug("MQTT Adaptor - Miniserver for MQTT: ", { topic: topic, data: payload });
+        app.logger.debug("MQTT Adaptor - Miniserver for MQTT, topic: " + topic + ", payload: " + payload);
         var fixedTopicName = topic.replace("+", "_").replace("#", "_")
         mqtt_client.publish(fixedTopicName, payload, options);
       } else {
@@ -74,7 +74,7 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
     });
 
     if (config.miniserver[msid].publish_structure)
-      lox_mqtt_adaptor.publish_mqtt_structure();
+      lox_mqtt_adaptor.publish_structure();
   });
 
   app.on('exit', function(code) {
@@ -97,7 +97,7 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
 
     let action = lox_mqtt_adaptor.get_command_from_topic(topic, message.toString());
 
-    app.logger.debug("MQTT Adaptor - for miniserver: ", { uuidAction: action.uuidAction, command: action.command });
+    app.logger.debug("MQTT Adaptor - for miniserver, uuidAction: " + action.uuidAction + ", command: ", + action.command);
 
     if (config.miniserver[msid].subscribe) {
       lox_ms_client.send_cmd(action.uuidAction, action.command);
