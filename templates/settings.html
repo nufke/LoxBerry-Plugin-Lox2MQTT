@@ -9,7 +9,13 @@
       Miniservers <a href="/admin/system/miniserver.cgi">here</a>.</p>
     <div v-if="config.miniserver">
       <div id="vforid" v-for="(ms, index) in config.miniserver">
-        <h3>Miniserver {{index}}</h3>
+
+        <div v-if="sysconfig.miniserver[index].Name">
+          <h3>Miniserver {{index}} ({{sysconfig.miniserver[index].Name}})</h3>
+        </div>
+        <div v-else>
+          <h3>Miniserver {{index}}</h3>
+        </div>
 
         <div class="ui-field-contain">
           <label for="ms.mqtt_topic_ms" class="col-fixed" style="min-width:15%">Miniserver topic name</label>
@@ -46,13 +52,20 @@
                   v-on:change="formadata_changed();">
               </div>
               <div class="ui-checkbox">
+                <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left"
+                  :class="{ 'ui-checkbox-on': ms.retain_message==true, 'ui-checkbox-off': ms.retain_message==false }"
+                  :for=`retain_message-${index}`>Retain published MQTT messages</label>
+                <input type="checkbox" :id=`retain_message-${index}` v-model="ms.retain_message"
+                  v-on:change="formadata_changed();">
+              </div>
+              <div class="ui-checkbox">
                 <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-last-child"
                   :class="{ 'ui-checkbox-on': ms.subscribe==true, 'ui-checkbox-off': ms.subscribe==false }"
                   :for=`subscribe-${index}`>Subscribe to MQTT</label>
                 <input type="checkbox" :id=`subscribe-${index}` v-model="ms.subscribe"
                   v-on:change="formadata_changed();">
               </div>
-              <p class="hint"><b>WARNING!</b> Publishing and subscribing to control states changes will increase the
+              <p class="hint"><b>WARNING!</b> Publishing and subscribing to control state changes will increase the
                 load on your Loxone Miniserver and MQTT server.</p>
             </div>
           </fieldset>
@@ -73,14 +86,6 @@
             </div>
           </div>
         </div> <!-- v-if ms.other_user -->
-        <div v-if="ms.publish_structure" class="ui-field-contain">
-          <label :for=`mqtt_topic_app-${index}` class="col-fixed" style="min-width:15%">LoxBerry App topic
-            name</label>
-          <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
-            <input type="text" required style="width:50%" :id=`mqtt_topic_app-${index}` v-model.trim="ms.mqtt_topic_app"
-              v-on:change="formadata_changed()">
-          </div>
-        </div>
       </div> <!-- v-for -->
 
       <div style="height:15px"></div>
@@ -122,7 +127,8 @@
       console.log("Setup called");
     },
     data() {
-      var config = this.getData();
+      var config = this.getPluginConfig();
+      var sysconfig = this.getSysConfig();
       const intervalID = setInterval(() => { this.updatePid() }, 5000);
       return {
         sl: {
@@ -132,6 +138,7 @@
             "over MQTT to control the Miniserver directly."
         },
         config: { miniserver: {} },
+        sysconfig: { miniserver: {} },
         data_changed: false,
         data_saved: false,
         data_save_error: false,
@@ -169,8 +176,8 @@
           });
       },
 
-      getData() {
-        console.log("Called getData");
+      getPluginConfig() {
+        console.log("Called getPluginConfig");
         fetch(generic + '?file=LBPCONFIG/lox2mqtt/default.json&read')
           .then((response) => {
             if (!response.ok) {
@@ -181,6 +188,20 @@
           .then(data => {
             this.config = data;
           });
+      },
+
+      getSysConfig() {
+        console.log("Called getSysConfig");
+        fetch(generic + '?file=LBSCONFIG/general.json&read&section=Miniserver')
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error, status = ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(data => {
+            this.sysconfig.miniserver = data;
+          })
       },
 
       updatePid() {

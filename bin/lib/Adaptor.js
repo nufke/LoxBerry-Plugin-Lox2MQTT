@@ -1,13 +1,10 @@
 const util = require('util');
 const events = require('events');
 
-var Adaptor = function(structure, mqtt_topic_ms, mqtt_topic_app, icon_path) {
+var Adaptor = function(structure, mqtt_topic_ms) {
   this.structure = structure;
   this.mqtt_topic_ms = mqtt_topic_ms;
-  this.mqtt_topic_app = mqtt_topic_app;
-  this.icon_path = icon_path;
-
-  this.device_info = this.structure.msInfo.serialNr;
+  this.serial_nr = this.structure.msInfo.serialNr;
   this.path2control = {};
   this.stateuuid2path = {};
   this.ispushbutton = {};
@@ -20,11 +17,11 @@ util.inherits(Adaptor, events.EventEmitter);
 
 Adaptor.prototype.set_value_for_uuid = function(uuid, value) {
   this.structure.set_value_for_uuid(uuid, value);
-  this.emit('for_mqtt', this.mqtt_topic_ms + '/' + this.device_info + '/' + uuid, value, true);
+  this.emit('for_mqtt', this.mqtt_topic_ms + '/' + this.serial_nr + '/' + uuid, value);
 };
 
 Adaptor.prototype.get_serialnr = function() {
-  return this.device_info;
+  return this.serial_nr;
 }
 
 Adaptor.prototype.get_command_from_topic = function(topic, data) {
@@ -54,7 +51,7 @@ Adaptor.prototype.abort = function() {
 };
 
 Adaptor.prototype.publish_structure = function() {
-  this.emit('for_mqtt', this.mqtt_topic_app + '/structure', JSON.stringify(this.structure), true);
+  this.emit('for_mqtt', this.mqtt_topic_ms + '/' + this.serial_nr + '/structure', JSON.stringify(this.structure));
 }
 
 Adaptor.prototype._process_states = function(obj) {
@@ -65,12 +62,12 @@ Adaptor.prototype._process_states = function(obj) {
       if (Array.isArray(obj.items[key].uuid)) { // handle array,
         let list = [];
         obj.items[key].uuid.forEach(uuid => {
-          list.push({ mqtt: that.mqtt_topic_ms + '/' + that.device_info + '/' + uuid })
+          list.push({ mqtt: that.mqtt_topic_ms + '/' + that.serial_nr + '/' + uuid })
         });
         states[camelToSnake(key)] = list;
       }
       else
-        states[camelToSnake(key)] = { mqtt: that.mqtt_topic_ms + '/' + that.device_info + '/' + obj.items[key].uuid };
+        states[camelToSnake(key)] = { mqtt: that.mqtt_topic_ms + '/' + that.serial_nr + '/' + obj.items[key].uuid };
     });
   }
   return states;

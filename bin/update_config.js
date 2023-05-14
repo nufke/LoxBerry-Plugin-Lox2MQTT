@@ -36,11 +36,11 @@ function update_config(config) {
         mqtt_topic_ms: "loxone",
         publish_structure: false,
         publish_states: false,
+        retain_message: false,
         subscribe: false,
         other_user: false,
         user: null,
-        pass: null,
-        mqtt_topic_app: "loxberry/app"
+        pass: null
       };
       config.miniserver[key] = ms;
     }
@@ -49,11 +49,11 @@ function update_config(config) {
       if (!ms.mqtt_topic_ms) ms.mqtt_topic_ms = "loxone";
       if (!ms.publish_structure) ms.publish_structure = false;
       if (!ms.publish_states) ms.publish_states = false;
+      if (!ms.retain_message) ms.retain_message = false;
       if (!ms.subscribe) ms.subscribe = false;
       if (!ms.other_user) ms.other_user = false;
       if (!ms.user) ms.user = null;
       if (!ms.pass) ms.pass = null;
-      if (!ms.mqtt_topic_app) ms.mqtt_topic_app = "loxberry/app";
     }
   });
 

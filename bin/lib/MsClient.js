@@ -21,20 +21,11 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
   }
 
   // check configuration variables
-  var mqtt_topic_app = config.mqtt_topic_app;
-  var icon_path = config.app_icon_path;
-  var mqtt_topic_ms = config.miniserver[msid].mqtt_topic_ms;
+  var retain_message = config.miniserver[msid].retain_message ? config.miniserver[msid].retain_message : false;
 
+  var mqtt_topic_ms = config.miniserver[msid].mqtt_topic_ms;
   if (mqtt_topic_ms === undefined || !mqtt_topic_ms.length) {
     mqtt_topic_ms = 'loxone';
-  }
-
-  if (mqtt_topic_app === undefined || !mqtt_topic_app.length) {
-    mqtt_topic_app = 'loxberry/app';
-  }
-
-  if (icon_path === undefined || !icon_path.length) {
-    icon_path = '/assets/icons/svg';
   }
 
   function _update_event(uuid, value) {
@@ -55,16 +46,16 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
       function(value) {
         app.logger.warn("MQTT Structure - invalid type of control", value);
       }
-    ), mqtt_topic_ms, mqtt_topic_app, icon_path);
+    ), mqtt_topic_ms);
 
     if (config.miniserver[msid].subscribe)
       mqtt_client.subscribe(lox_mqtt_adaptor.get_topics_for_subscription());
 
-    lox_mqtt_adaptor.on('for_mqtt', function(topic, data, retain_) {
+    lox_mqtt_adaptor.on('for_mqtt', function(topic, data) {
 
       if (config.miniserver[msid].publish_states) {
         let payload = String(data);
-        let options = { retain: retain_ };
+        let options = { retain: retain_message };
         app.logger.debug("MQTT Adaptor - Miniserver for MQTT, topic: " + topic + ", payload: " + payload);
         var fixedTopicName = topic.replace("+", "_").replace("#", "_")
         mqtt_client.publish(fixedTopicName, payload, options);

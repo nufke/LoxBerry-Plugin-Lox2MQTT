@@ -1,5 +1,13 @@
 # Version History
 
+## v0.4.0 (BETA)
+
+ * show Miniserver name on configuration page
+ * add configuration option to retain MQTT messages
+ * use Miniserver topic name to publish structure
+ * remove LoxBerry App topic name from configuration
+ * Updated documentation/readme
+
 ## v0.3.0 (BETA)
 
  * fix: Debug logger shows content, update [loxberry-logger](https://github.com/nufke/loxberry-logger)

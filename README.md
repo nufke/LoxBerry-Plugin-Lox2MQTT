@@ -22,21 +22,19 @@ Use the LoxBerry plugin webpage to configure communication with MQTT. The plugin
 
     * **Publish control states**: the Miniserver controls state changes are published (default: false)
 
-    * **Subscribe to MQTT**: the Miniserver will listen to MQTT and control commands made over MQTT will control the Miniserver (default: false)
+    * **Retain published MQTT messages**: Published MQTT messages will be retained by the MQTT server (default: false)
+
+    * **Subscribe to MQTT**: the Miniserver will listen to MQTT and control commands sent over MQTT will control the Miniserver (default: false)
 
   * **Miniserver username**: Miniserver username (if enabled, default: empty)
 
   * **Miniserver password**: Miniserver password (if enabled, default: empty)
 
-  * **LoxBerry App topic name**: If enabled: MQTT topic name used when publising the Miniserver structure over MQTT (if enabled, default: loxberry/app)
-
 When saving the configuration, the Lox2MQTT plugin will be restarted automatically. Updates to the general Miniserver settings or plugin logging level will also restart this plugin. The process status of the Lox2MQTT plugin is shown at the bottom of the configuration page. Also
 
 **WARNING!** Publishing and subscribing to control state changes will increase the load on your Loxone Miniserver(s) and MQTT server.
 
-*NOTE: The configuration settings for the LoxBerry App are optional, as the LoxBeryy App plugin is not yet released.*
-
-## Miniserver to MQTT Broadcast
+## Broadcasting Miniserver state changes over MQTT
 
 Each Miniserver state change is broadcasted over MQTT, using the following topic structure:
 
@@ -45,6 +43,8 @@ Each Miniserver state change is broadcasted over MQTT, using the following topic
 ```
 
 Each MQTT message uses a topic name `<mqtt_topic_ms>` as is defined in the configuration, to identify messages send to or from a Loxone Miniserver. The next topic level specifies the serial number `serialnr` of the Miniserver, followed by a unique identifier `uuid`, and `state` representing a control state, which can be found in the Loxone structure file `LoxAPP3.json` on your Miniserver.
+
+If enabled, each last Miniserver control state broadcast is retained by the MQTT server. This enables MQTT clients to receive the latest state values immediately after subscribing to the topic.
 
 As MQTT topics are case sentitive, the `CamelCase` state names as defined in the Loxone structure file `LoxAPP3.json` are mapped to lowercase `snake_case` topic strings. For example, the state `activeMoodsNum` of a control of type `LightControllerV2` is translated into `active_moods_num`.
 
@@ -56,7 +56,17 @@ loxone/0123456789AB/01234567-abcd-0123-ffffeeeeddddcccc/states/value 0.843134582
 
 Where `loxone` is the MQTT topic indicating a Miniserver message, `0123456789AB` is the Miniserver serial nr., and `01234567-abcd-0123-ffffeeeeddddcccc` the uuid of the control state, and the value is `0.8431345820426941`.
 
-## Controling the Loxone Miniserver via MQTT
+## Broadcasting Miniserver structure over MQTT
+
+If enabled, the Miniserver structure (`LoxAPP3.json`) is broadcasted over MQTT, but only once, at plugin startup. It uses the following topic:
+
+```
+<mqtt_topic_ms>/<serialnr>/structure <LoxAPP3.json>
+```
+
+If enabled, the Miniserver structure is retained by the MQTT server. This enables MQTT clients to receive the latest sttructure immediately after subscribing to the topic.
+
+## Controling the Loxone Miniserver over MQTT
 
 To control a Loxone Miniserver, a messages should be send using the following topic structure:
 
