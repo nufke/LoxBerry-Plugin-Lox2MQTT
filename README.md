@@ -58,13 +58,13 @@ Where `loxone` is the MQTT topic indicating a Miniserver message, `0123456789AB`
 
 ## Broadcasting Miniserver structure over MQTT
 
-If enabled, the Miniserver structure (`LoxAPP3.json`) is broadcasted over MQTT, but only once, at plugin startup. It uses the following topic:
+If enabled, the Miniserver structure (`LoxAPP3.json`) is broadcasted over MQTT, but only once, at plugin startup. It uses the following topic structure:
 
 ```
 <mqtt_topic_ms>/<serialnr>/structure <LoxAPP3.json>
 ```
 
-If enabled, the Miniserver structure is retained by the MQTT server. This enables MQTT clients to receive the latest sttructure immediately after subscribing to the topic.
+If enabled, the Miniserver structure is retained by the MQTT server. This enables MQTT clients to receive the latest structure immediately after subscribing to the topic.
 
 ## Controling the Loxone Miniserver over MQTT
 

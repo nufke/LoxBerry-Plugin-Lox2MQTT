@@ -1,5 +1,9 @@
 # Version History
 
+## v0.4.1 (BETA)
+
+ * fix: only support http port for communication with Miniserver(s)
+
 ## v0.4.0 (BETA)
 
  * show Miniserver name on configuration page
