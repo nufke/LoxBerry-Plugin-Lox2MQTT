@@ -2,7 +2,6 @@ const fs = require('fs');
 
 const WebSocket = require("./WebSocketAPI.js");
 const Adaptor = require("./Adaptor.js");
-const Structure = require("node-lox-structure-file");
 const MqttClient = require("./mqtt_builder.js");
 
 var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
@@ -41,12 +40,9 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
     if (lox_mqtt_adaptor) {
       lox_mqtt_adaptor.abort();
     }
+    console.log('data:', JSON.stringify(data));
 
-    lox_mqtt_adaptor = new Adaptor(Structure.create_from_json(data,
-      function(value) {
-        app.logger.warn("MQTT Structure - invalid type of control", value);
-      }
-    ), mqtt_topic_ms);
+    lox_mqtt_adaptor = new Adaptor(data, mqtt_topic_ms);
 
     if (config.miniserver[msid].subscribe)
       mqtt_client.subscribe(lox_mqtt_adaptor.get_topics_for_subscription());

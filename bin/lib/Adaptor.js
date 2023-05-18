@@ -1,8 +1,14 @@
 const util = require('util');
 const events = require('events');
+const Structure = require("node-lox-structure-file");
 
-var Adaptor = function(structure, mqtt_topic_ms) {
-  this.structure = structure;
+var Adaptor = function(data, mqtt_topic_ms) {
+  this.data = data; // raw structure;
+  this.structure = Structure.create_from_json(data,
+    function(value) {
+      app.logger.warn("MQTT Structure - invalid type of control", value);
+    }
+  );
   this.mqtt_topic_ms = mqtt_topic_ms;
   this.serial_nr = this.structure.msInfo.serialNr;
   this.path2control = {};
@@ -50,8 +56,8 @@ Adaptor.prototype.abort = function() {
   this.removeAllListeners();
 };
 
-Adaptor.prototype.publish_structure = function() {
-  this.emit('for_mqtt', this.mqtt_topic_ms + '/' + this.serial_nr + '/structure', JSON.stringify(this.structure));
+Adaptor.prototype.publish_structure = function() { // NOTE: we publish the original structure
+  this.emit('for_mqtt', this.mqtt_topic_ms + '/' + this.serial_nr + '/structure', JSON.stringify(this.data));
 }
 
 Adaptor.prototype._process_states = function(obj) {
