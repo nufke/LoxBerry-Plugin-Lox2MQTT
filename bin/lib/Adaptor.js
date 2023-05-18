@@ -60,25 +60,6 @@ Adaptor.prototype.publish_structure = function() { // NOTE: we publish the origi
   this.emit('for_mqtt', this.mqtt_topic_ms + '/' + this.serial_nr + '/structure', JSON.stringify(this.data));
 }
 
-Adaptor.prototype._process_states = function(obj) {
-  let that = this;
-  let states = {};
-  if (obj) {
-    Object.keys(obj.items).forEach(function(key) {
-      if (Array.isArray(obj.items[key].uuid)) { // handle array,
-        let list = [];
-        obj.items[key].uuid.forEach(uuid => {
-          list.push({ mqtt: that.mqtt_topic_ms + '/' + that.serial_nr + '/' + uuid })
-        });
-        states[camelToSnake(key)] = list;
-      }
-      else
-        states[camelToSnake(key)] = { mqtt: that.mqtt_topic_ms + '/' + that.serial_nr + '/' + obj.items[key].uuid };
-    });
-  }
-  return states;
-}
-
 Adaptor.prototype._build_paths = function() {
   Object.keys(this.structure.controls.items).forEach(function(key) {
     var control = this.structure.controls.items[key];
@@ -100,11 +81,6 @@ Adaptor.prototype._add_control = function(control) {
   var serialnr = this.structure.msInfo.serialNr;
   var path = this.mqtt_topic_ms + '/' + serialnr + '/' + control.uuidAction;
   this.path2control[path] = control;
-}
-
-function camelToSnake(str) {
-  let s = str[0].toLowerCase() + str.slice(1);
-  return s.replace(/[A-Z]/g, (c) => { return '_' + c.toLowerCase() });
 }
 
 module.exports = Adaptor;

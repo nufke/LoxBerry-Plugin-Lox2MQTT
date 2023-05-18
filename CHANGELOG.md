@@ -1,5 +1,10 @@
 # Version History
 
+## v0.4.2 (BETA)
+
+ * fix: publish native Miniserver structure
+ * fix: update MQTT broadcast definitions in README
+
 ## v0.4.1 (BETA)
 
  * fix: only support http port for communication with Miniserver(s)

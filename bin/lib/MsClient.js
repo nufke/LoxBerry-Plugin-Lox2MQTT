@@ -40,7 +40,6 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
     if (lox_mqtt_adaptor) {
       lox_mqtt_adaptor.abort();
     }
-    console.log('data:', JSON.stringify(data));
 
     lox_mqtt_adaptor = new Adaptor(data, mqtt_topic_ms);
 
