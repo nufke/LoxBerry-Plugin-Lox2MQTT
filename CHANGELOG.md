@@ -1,5 +1,11 @@
 # Version History
 
+## v0.4.3 (BETA)
+
+ * fix: enforce use of http port 80 (secure TLS / https not yet supported)
+ * changed dependency to codm/node-lox-ws-api bugfix release
+ * write lox2mqtt version in log file for debug purposes
+
 ## v0.4.2 (BETA)
 
  * fix: publish native Miniserver structure
