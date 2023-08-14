@@ -9,8 +9,8 @@ var App = function(logger, logFile) {
   this.logger = logger;
   this.logFile = logFile;
 
-  this.logger.info('Lox2MQTT started');
-  this.logger.startLog('lox2mqtt', 'Lox2MQTT', this.logFile, 'Lox2MQTT ' + process.env.npm_package_version + ' started');
+  this.logger.info('Lox2MQTT ' + process.env.npm_package_version + ' started');
+  this.logger.startLog('lox2mqtt', 'Lox2MQTT', this.logFile, 'Lox2MQTT started');
 
   process.on('SIGINT', function() {
     that.logger.info('Lox2MQTT try to stop');

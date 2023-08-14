@@ -1,5 +1,10 @@
 # Version History
 
+## v0.4.4 (BETA)
+
+ * add more websocket debug info to log file (if enabled)
+ * fix: write lox2mqtt version in log file for debug purposes
+
 ## v0.4.3 (BETA)
 
  * fix: enforce use of http port 80 (secure TLS / https not yet supported)

@@ -122,6 +122,18 @@ var WebSocketAPI = function(app, config, globalConfig, msid) {
     app.logger.debug("WebSocketAPI " + host + "- get structure file " + data.lastModified);
   });
 
+  client.on('auth_failed', function() {
+    app.logger.debug("WebSocketAPI " + host + " - authorization failed");
+  });
+
+  client.on('error', function() {
+    app.logger.debug("WebSocketAPI " + host + " - error");
+  });
+
+  client.on('close_failed', function() {
+    app.logger.debug("WebSocketAPI " + host + " - close failed");
+  });
+
   return client;
 };
 
