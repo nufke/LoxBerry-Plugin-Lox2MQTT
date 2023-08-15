@@ -41,7 +41,7 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
       lox_mqtt_adaptor.abort();
     }
 
-    lox_mqtt_adaptor = new Adaptor(data, mqtt_topic_ms);
+    lox_mqtt_adaptor = new Adaptor(app, data, mqtt_topic_ms);
 
     if (config.miniserver[msid].subscribe)
       mqtt_client.subscribe(lox_mqtt_adaptor.get_topics_for_subscription());

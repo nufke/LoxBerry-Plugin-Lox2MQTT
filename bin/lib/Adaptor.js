@@ -2,11 +2,11 @@ const util = require('util');
 const events = require('events');
 const Structure = require("node-lox-structure-file");
 
-var Adaptor = function(data, mqtt_topic_ms) {
+var Adaptor = function(app, data, mqtt_topic_ms) {
   this.data = data; // raw structure;
   this.structure = Structure.create_from_json(data,
     function(value) {
-      app.logger.warn("MQTT Structure - invalid type of control", value);
+      app.logger.warn("MQTT Adaptor - Undefined control found in Loxone Structure: " +  JSON.stringify(value));
     }
   );
   this.mqtt_topic_ms = mqtt_topic_ms;

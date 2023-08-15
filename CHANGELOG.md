@@ -1,5 +1,9 @@
 # Version History
 
+## v0.4.5 (BETA)
+
+ * fix: error handling when undefined control is found in Loxone structure
+
 ## v0.4.4 (BETA)
 
  * add more websocket debug info to log file (if enabled)

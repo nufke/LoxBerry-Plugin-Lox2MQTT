@@ -1,6 +1,6 @@
 {
   "name": "lox2mqtt",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "Loxone Miniserver communicating with MQTT server",
   "main": "lox2mqtt.js",
   "directories": {
