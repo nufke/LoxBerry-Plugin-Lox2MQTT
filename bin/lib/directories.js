@@ -9,6 +9,6 @@ const directories = () => {
     system_config: '/opt/loxberry/config/system',
     syslogdir: '/opt/loxberry/log/system_tmpfs'
   };
-}
+};
 
 module.exports = directories();

@@ -23,12 +23,12 @@ util.inherits(Adaptor, events.EventEmitter);
 
 Adaptor.prototype.set_value_for_uuid = function(uuid, value) {
   this.structure.set_value_for_uuid(uuid, value);
-  this.emit('for_mqtt', this.mqtt_topic_ms + '/' + this.serial_nr + '/' + uuid, value);
+  this.emit('for_mqtt_state', this.mqtt_topic_ms + '/' + this.serial_nr + '/' + uuid, value);
 };
 
 Adaptor.prototype.get_serialnr = function() {
   return this.serial_nr;
-}
+};
 
 Adaptor.prototype.get_command_from_topic = function(topic, data) {
   var path_groups = topic.match('^(.+)/cmd$');
@@ -57,8 +57,8 @@ Adaptor.prototype.abort = function() {
 };
 
 Adaptor.prototype.publish_structure = function() { // NOTE: we publish the original structure
-  this.emit('for_mqtt', this.mqtt_topic_ms + '/' + this.serial_nr + '/structure', JSON.stringify(this.data));
-}
+  this.emit('for_mqtt_structure', this.mqtt_topic_ms + '/' + this.serial_nr + '/structure', JSON.stringify(this.data));
+};
 
 Adaptor.prototype._build_paths = function() {
   Object.keys(this.structure.controls.items).forEach(function(key) {
@@ -81,6 +81,6 @@ Adaptor.prototype._add_control = function(control) {
   var serialnr = this.structure.msInfo.serialNr;
   var path = this.mqtt_topic_ms + '/' + serialnr + '/' + control.uuidAction;
   this.path2control[path] = control;
-}
+};
 
 module.exports = Adaptor;

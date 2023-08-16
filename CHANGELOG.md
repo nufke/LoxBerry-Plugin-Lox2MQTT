@@ -1,5 +1,12 @@
 # Version History
 
+## v0.4.6 (BETA)
+
+ * revert: use of http port 80, use specified http port
+ * fix: show structure in log file (debug) when option is enabled
+ * fix: show state changes in log file (debug) when option is enabled
+ * fix: recognize NfcCodeTouch control (fixed filename)
+
 ## v0.4.5 (BETA)
 
  * fix: error handling when undefined control is found in Loxone structure

@@ -9,9 +9,9 @@ function _limit_string(text, limit) {
 
 var WebSocketAPI = function(app, config, globalConfig, msid) {
   var miniserver = globalConfig.Miniserver[msid];
-  // FIXME: currently only support for http port and port 80 for communication with Miniserver(s)
+  // FIXME: currently only support for http port for communication with Miniserver(s)
   // var host = miniserver.Ipaddress + ":" + ((miniserver.Preferhttps==='1') ? miniserver.Porthttps : miniserver.Port);
-  var host = miniserver.Ipaddress + ":80";
+  var host = miniserver.Ipaddress + ":" + miniserver.Port;
   const user = config.miniserver[msid].other_user ? config.miniserver[msid].user : miniserver.Admin_raw;
   const pass = config.miniserver[msid].other_user ? config.miniserver[msid].pass : miniserver.Pass_raw;
 
