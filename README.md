@@ -1,6 +1,6 @@
 # LoxBerry-Plugin-Lox2MQTT
 
-LoxBerry plugin to enable communication between the Loxone Miniserver and MQTT. This plugin connects to the Loxone Miniserver websocket and the LoxBerry MQTT Gateway and publishes Miniserver state changes over MQTT. In addition, control commands can be send over MQTT to control the Miniserver directly.
+LoxBerry plugin to enable communication between the Loxone Miniserver and MQTT. This plugin connects to the Loxone Miniserver websocket and the LoxBerry MQTT Widget and publishes Miniserver state changes over MQTT. In addition, control commands can be send over MQTT to control the Miniserver directly.
 
 *NOTE: The current version is not production ready. Use it at your own risk.*
 
@@ -10,7 +10,7 @@ Use the LoxBerry plugin installation procedure.
 
 ## Configuration
 
-Use the LoxBerry plugin webpage to configure communication with MQTT. The plugin detects and lists the available Miniservers. For each Miniserver, the following configuration options are available:
+Use the LoxBerry plugin webpage to configure the communication using MQTT. The plugin detects and lists the available Miniservers. For each Miniserver, the following configuration options are available:
 
   * **Miniserver topic name**: MQTT topic name used when publishing control state changes (default: loxone)
 
@@ -30,9 +30,9 @@ Use the LoxBerry plugin webpage to configure communication with MQTT. The plugin
 
   * **Miniserver password**: Miniserver password (if enabled, default: empty)
 
-When saving the configuration, the Lox2MQTT plugin will be restarted automatically. Updates to the general Miniserver settings or plugin logging level will also restart this plugin. The process status of the Lox2MQTT plugin is shown at the bottom of the configuration page. Also
+When saving the configuration, the Lox2MQTT plugin will be restarted automatically. Updates to the general Miniserver settings or plugin logging level will also restart this plugin. The process status of the Lox2MQTT plugin is shown at the bottom of the configuration page. When the status is colored green, the process is running as expected. In case of issues, the text color is red. In this case, check the log file for more details.
 
-**WARNING!** Publishing and subscribing to control state changes will increase the load on your Loxone Miniserver(s) and MQTT server.
+**WARNING!** Publishing and subscribing to control state changes will increase the load on your Loxone Miniserver(s) and MQTT server!
 
 ## Broadcasting Miniserver state changes over MQTT
 
@@ -86,9 +86,9 @@ In this example, a switch on Miniserver `0123456789AB` with uuid `01234567-abcd-
 
 ## FAQ
 
-**Q: What is the difference between the LoxBerry MQTT Gateway and Lox2MQTT?**
+**Q: What is the difference between the LoxBerry MQTT Widget and Lox2MQTT?**
 
-A: LoxBerry MQTT Gateway communicates to the Miniserver via HTTP Virtual Inputs or UDP messages, which require additional infrastructure in your Loxone Config program. The Lox2MQTT plugin connects to the Miniserver websocket and has direct access to the Miniserver controls and states. Therefore there are no changes required in your Loxone Config program.
+A: The LoxBerry MQTT Widget communicates to the Miniserver via HTTP Virtual Inputs or UDP messages, which require additional infrastructure in your Loxone Config program. The Lox2MQTT plugin connects to the Miniserver websocket and has direct access to the Miniserver controls and states. Therefore there are no changes required in your Loxone Config program.
 
 **Q: I receive state information from my Miniserver over MQTT, but I do not recognize the format and identifiers**
 
