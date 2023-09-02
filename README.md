@@ -12,19 +12,19 @@ Use the LoxBerry plugin installation procedure.
 
 Use the LoxBerry plugin webpage to configure the communication using MQTT. The plugin detects and lists the available Miniservers. For each Miniserver, the following configuration options are available:
 
-  * **Miniserver topic name**: MQTT topic name used when publishing control state changes (default: loxone)
+  * **Miniserver topic name**: MQTT topic name used when publishing control state changes and subscribing to Miniserver control commands (default: loxone)
 
   * **Options**:
 
     * **Use other Miniserver login credentials**: Connect to the Miniserver as a different user (default: false)
 
-    * **Publish structure**: at plugin startup, the Miniserver structure is published (default: false)
+    * **Publish structure**: at plugin startup, the Miniserver structure is published over MQTT (default: false)
 
-    * **Publish control states**: the Miniserver controls state changes are published (default: false)
+    * **Publish control state changes**: the Miniserver controls state changes are published (default: false)
 
     * **Retain published MQTT messages**: Published MQTT messages will be retained by the MQTT server (default: false)
 
-    * **Subscribe to MQTT**: the Miniserver will listen to MQTT and control commands sent over MQTT will control the Miniserver (default: false)
+    * **Subscribe to MQTT to control the Miniserver**: Control commands sent over MQTT will control the Miniserver (default: false)
 
   * **Miniserver username**: Miniserver username (if enabled, default: empty)
 
@@ -66,11 +66,13 @@ If enabled, the Miniserver structure is retained by the MQTT server. This enable
 
 ## Controling the Loxone Miniserver over MQTT
 
-To control a Loxone Miniserver, a messages should be send using the following topic structure:
+To control a Loxone Miniserver, a message should be send using the following topic structure:
 
 ```
 <mqtt_topic_ms>/<serialnr>/<uuid>/cmd <command>
+```
 or
+```
 <mqtt_topic_ms>/<serialnr>/<uuid>/<subcontrol>/cmd <command>
 ```
 

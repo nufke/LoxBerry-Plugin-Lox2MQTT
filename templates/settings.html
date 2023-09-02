@@ -47,7 +47,7 @@
               <div class="ui-checkbox">
                 <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left"
                   :class="{ 'ui-checkbox-on': ms.publish_states==true, 'ui-checkbox-off': ms.publish_states==false }"
-                  :for=`publish_states-${index}`>Publish control states</label>
+                  :for=`publish_states-${index}`>Publish control state changes</label>
                 <input type="checkbox" :id=`publish_states-${index}` v-model="ms.publish_states"
                   v-on:change="formadata_changed();">
               </div>
@@ -61,7 +61,7 @@
               <div class="ui-checkbox">
                 <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-last-child"
                   :class="{ 'ui-checkbox-on': ms.subscribe==true, 'ui-checkbox-off': ms.subscribe==false }"
-                  :for=`subscribe-${index}`>Subscribe to MQTT</label>
+                  :for=`subscribe-${index}`>Subscribe to MQTT to control the Miniserver</label>
                 <input type="checkbox" :id=`subscribe-${index}` v-model="ms.subscribe"
                   v-on:change="formadata_changed();">
               </div>
