@@ -98,9 +98,9 @@ A: A received MQTT message has the following format: `<mqtt_topic_ms>/<serialnr>
 
 A: Yes, you can send MQTT messages which are converted to commands for the Loxone Miniserver. A transmited MQTT message should have the following format: `<mqtt_topic_ms>/<serialnr>/<uuid>/cmd <command>`. Note the command extension (`/cmd`) in this message, which has been added to the unique identifier of a control or subcontrol. The allowed values for `command` are defined in the [Loxone Structure File](https://www.loxone.com/dede/wp-content/uploads/sites/2/2022/06/1300_Structure-File.pdf)
 
-**Q: Where can I find my Loxone Miniserver structure file LoxAPP3.json?**
+**Q: Where can I find my Loxone Miniserver structure file `LoxAPP3.json`?**
 
-A: You can download your Loxone Miniserver structure file via URL `http://<minserver_ip_address>/data/LoxAPP3.json` or access it via FTP in directory `web/data/LoxAPP3.json`.
+A: You can download your structure file via URL `http://<miniserver_ip_address>/data/LoxAPP3.json` or access it via FTP in directory `web/data/LoxAPP3.json`. In both cases, login credentials are required.
 
 ## Issues and questions
 
