@@ -56,7 +56,7 @@ Where `loxone` is the MQTT topic indicating a Miniserver message, `0123456789AB`
 
 ## Broadcasting Miniserver structure over MQTT
 
-If enabled, the Miniserver structure (`LoxAPP3.json`) is broadcasted over MQTT, but only once, at plugin startup. It uses the following topic structure:
+Broadcasting the Miniserver structure might be relevant for MQTT subscribers such as mobile apps to receive information on the available controls, their properties, capabilties and states. If enabled, the Miniserver structure (`LoxAPP3.json`) is broadcasted over MQTT, but only once, at plugin startup. It uses the following topic structure:
 
 ```
 <mqtt_topic_ms>/<serialnr>/structure <LoxAPP3.json>
@@ -74,7 +74,7 @@ or
 <mqtt_topic_ms>/<serialnr>/<uuid>/<subcontrol>/cmd <command>
 ```
 
-Note that Loxone subcontrols share the same `uuid` inherited from the parent control, and therefore define an additional string `subcontrol`.
+Note that Loxone subcontrols share the same `uuid` inherited from the parent control, and therefore define an additional string `subcontrol`. The name for the `subcontrol` can be found in the Loxone Miniserver structure file `LoxAPP3.json` listed under the `uuid` of the parent control.
 
 **Example**
 
@@ -88,15 +88,19 @@ In this example, a switch on Miniserver `0123456789AB` with uuid `01234567-abcd-
 
 **Q: What is the difference between the LoxBerry MQTT Widget and Lox2MQTT?**
 
-A: The LoxBerry MQTT Widget communicates to the Miniserver via HTTP Virtual Inputs or UDP messages, which require additional infrastructure in your Loxone Config program. The Lox2MQTT plugin connects to the Miniserver websocket and has direct access to the Miniserver controls and states. Therefore there are no changes required in your Loxone Config program.
+A: The LoxBerry MQTT Widget communicates to the Miniserver via HTTP Virtual Inputs or UDP messages, which require additional infrastructure in your Loxone Config program. The Lox2MQTT plugin connects to the Miniserver websocket and has direct access to the Miniserver controls and states. Therefore there are no changes required in your Loxone Config program to interact with your Miniserver.
 
 **Q: I receive state information from my Miniserver over MQTT, but I do not recognize the format and identifiers**
 
-A: A received MQTT message has the following format: `<mqtt_topic_ms>/<serialnr>/<uuid> <value>`. Each MQTT message uses the Miniserver topic name (`mqtt_topic_ms`) as defined in the configuration to identify messages coming from a Loxone Miniserver. The next topic level specifies the serial number (`serialnr`) of your Miniserver, followed by the unique identifier (`uuid`) representing a control state as defined in the Loxone structure file `LoxAPP3.json` on your Miniserver.
+A: A received MQTT message has the following format: `<mqtt_topic_ms>/<serialnr>/<uuid> <value>`. Each MQTT message uses the Miniserver topic name (`mqtt_topic_ms`) as defined in the plugin configuration to identify messages coming from a Loxone Miniserver. The next topic level specifies the serial number (`serialnr`) of your Miniserver, followed by the unique identifier (`uuid`) representing a control state as defined in the Loxone structure file `LoxAPP3.json` on your Miniserver.
 
 **Q: Can I change the Miniserver control states via MQTT?**
 
 A: Yes, you can send MQTT messages which are converted to commands for the Loxone Miniserver. A transmited MQTT message should have the following format: `<mqtt_topic_ms>/<serialnr>/<uuid>/cmd <command>`. Note the command extension (`/cmd`) in this message, which has been added to the unique identifier of a control or subcontrol. The allowed values for `command` are defined in the [Loxone Structure File](https://www.loxone.com/dede/wp-content/uploads/sites/2/2022/06/1300_Structure-File.pdf)
+
+**Q: Where can I find my Loxone Miniserver structure file LoxAPP3.json?**
+
+A: You can download your Loxone Miniserver structure file via URL `http://<minserver_ip_address>/data/LoxAPP3.json` or access it via FTP in directory `web/data/LoxAPP3.json`.
 
 ## Issues and questions
 
