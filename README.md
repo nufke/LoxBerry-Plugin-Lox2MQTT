@@ -1,6 +1,6 @@
 # LoxBerry-Plugin-Lox2MQTT
 
-LoxBerry plugin to enable communication between the Loxone Miniserver and MQTT. This plugin connects to the Loxone Miniserver websocket and the LoxBerry MQTT Widget and publishes Miniserver state changes over MQTT. In addition, control commands can be send over MQTT to control the Miniserver directly.
+LoxBerry plugin to enable communication between the Loxone Miniserver and MQTT. This plugin connects to the Loxone Miniserver websocket and the LoxBerry MQTT Widget and publishes Miniserver control state changes over MQTT. In addition, control commands can be send over MQTT to control the Miniserver directly.
 
 *NOTE: The current version is not production ready. Use it at your own risk.*
 
@@ -18,9 +18,9 @@ Use the LoxBerry plugin webpage to configure the communication using MQTT. The p
 
     * **Use other Miniserver login credentials**: Connect to the Miniserver as a different user (default: false)
 
-    * **Publish structure**: at plugin startup, the Miniserver structure is published over MQTT (default: false)
+    * **Publish structure**: the Miniserver structure is published over MQTT (default: false)
 
-    * **Publish control state changes**: the Miniserver controls state changes are published (default: false)
+    * **Publish control state changes**: the Miniserver control state changes are published over MQTT (default: false)
 
     * **Retain published MQTT messages**: Published MQTT messages will be retained by the MQTT server (default: false)
 
@@ -30,7 +30,7 @@ Use the LoxBerry plugin webpage to configure the communication using MQTT. The p
 
   * **Miniserver password**: Miniserver password (if enabled, default: empty)
 
-When saving the configuration, the Lox2MQTT plugin will be restarted automatically. Updates to the general Miniserver settings or plugin logging level will also restart this plugin. The process status of the Lox2MQTT plugin is shown at the bottom of the configuration page. When the status is colored green, the process is running as expected. In case of issues, the text color is red. In this case, check the log file for more details.
+When saving the configuration, the Lox2MQTT plugin will be restarted automatically. Updates to the general Miniserver settings or plugin logging level will also restart this plugin. The process status of the Lox2MQTT plugin is shown at the bottom of the configuration page. When the status is colored green, the process is running as expected. In case of issues, the text color is red and check the log file for more details.
 
 **WARNING!** Publishing and subscribing to control state changes will increase the load on your Loxone Miniserver(s) and MQTT server!
 

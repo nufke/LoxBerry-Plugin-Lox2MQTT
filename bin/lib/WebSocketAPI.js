@@ -31,17 +31,16 @@ var WebSocketAPI = function(app, config, globalConfig, msid) {
     app.logger.info("WebSocketAPI " + host + " - authorized");
   });
 
-  client.on('connect_failed', function() {
-    app.logger.error("WebSocketAPI " + host + " - connect failed");
+  client.on('connect_failed', function(error, reason) {
+    app.logger.error("WebSocketAPI " + host + " - connect failed: " + reason);
   });
 
-  client.on('connection_error', function(error) {
-    app.logger.error("WebSocketAPI " + host + " - connection error: " + error);
-    app.exit(1);
+  client.on('connection_error', function(error, reason) {
+    app.logger.error("WebSocketAPI " + host + " - connection error: " + reason);
   });
 
-  client.on('close', function() {
-    app.logger.info("WebSocketAPI " + host + " - close");
+  client.on('close', function(info, reason) {
+    app.logger.info("WebSocketAPI " + host + " - close: " + reason);
   });
 
   client.on('send', function(message) {

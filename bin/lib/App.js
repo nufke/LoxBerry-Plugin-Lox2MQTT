@@ -27,11 +27,9 @@ var App = function(logger, logFile) {
 util.inherits(App, events.EventEmitter);
 
 App.prototype.exit = function(code, message) {
-  var that = this;
   this.emit('exit', code);
-
-  that.logger.info('Lox2MQTT exit - ' + message);
-  that.logger.closeLog(that.logFile);
+  this.logger.info('Lox2MQTT exit - ' + message);
+  this.logger.closeLog(this.logFile);
 };
 
 module.exports = App;

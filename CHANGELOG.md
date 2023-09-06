@@ -1,5 +1,10 @@
 # Version History
 
+## v0.4.7 (BETA)
+
+ * fix: no program exit after connection error
+ * documentation and readme update
+
 ## v0.4.6 (BETA)
 
  * revert: use of http port 80, use specified http port
