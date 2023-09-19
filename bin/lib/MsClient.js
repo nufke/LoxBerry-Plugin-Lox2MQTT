@@ -43,6 +43,8 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
 
   lox_ms_client.on('update_event_text', _update_event);
   lox_ms_client.on('update_event_value', _update_event);
+  lox_ms_client.on('update_event_daytimer', _update_event);
+  lox_ms_client.on('update_event_weather', _update_event);
 
   lox_ms_client.on('get_structure_file', function(data) {
     if (lox_mqtt_adaptor) {
@@ -55,7 +57,7 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
       mqtt_client.subscribe(lox_mqtt_adaptor.get_topics_for_subscription());
     }
 
-    lox_mqtt_adaptor.on('for_mqtt_state', function(topic, data) {
+    lox_mqtt_adaptor.on('publish_state', function(topic, data) {
       if (config.miniserver[msid].publish_states) {
         _publish_topic(topic, data);
       } else {
@@ -63,7 +65,7 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
       }
     });
 
-    lox_mqtt_adaptor.on('for_mqtt_structure', function(topic, data) {
+    lox_mqtt_adaptor.on('publish_structure', function(topic, data) {
       if (config.miniserver[msid].publish_structure) {
         _publish_topic(topic, data);
       } else {

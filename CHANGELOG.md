@@ -1,5 +1,10 @@
 # Version History
 
+## v0.5.0 (BETA)
+
+ * publish daytimer and weather events
+ * update reference to latest Loxone structure file documentation (14.2)
+
 ## v0.4.7 (BETA)
 
  * fix: no program exit after connection error

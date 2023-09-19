@@ -23,7 +23,7 @@ util.inherits(Adaptor, events.EventEmitter);
 
 Adaptor.prototype.set_value_for_uuid = function(uuid, value) {
   this.structure.set_value_for_uuid(uuid, value);
-  this.emit('for_mqtt_state', this.mqtt_topic_ms + '/' + this.serial_nr + '/' + uuid, value);
+  this.emit('publish_state', this.mqtt_topic_ms + '/' + this.serial_nr + '/' + uuid, value);
 };
 
 Adaptor.prototype.get_serialnr = function() {
@@ -57,7 +57,7 @@ Adaptor.prototype.abort = function() {
 };
 
 Adaptor.prototype.publish_structure = function() { // NOTE: we publish the original structure
-  this.emit('for_mqtt_structure', this.mqtt_topic_ms + '/' + this.serial_nr + '/structure', JSON.stringify(this.data));
+  this.emit('publish_structure', this.mqtt_topic_ms + '/' + this.serial_nr + '/structure', JSON.stringify(this.data));
 };
 
 Adaptor.prototype._build_paths = function() {
