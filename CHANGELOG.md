@@ -1,5 +1,10 @@
 # Version History
 
+## v0.5.1 (BETA)
+
+ * fix: keep alive when MQTT server is unreachable
+ * improve reporting in log when MQTT server is unreachable
+
 ## v0.5.0 (BETA)
 
  * publish daytimer and weather events
