@@ -30,6 +30,14 @@ function update_config(config) {
     config.miniserver = {};
   }
 
+  if (!config.pms) {
+    config['pms'] = 
+    {
+      url: "",
+      key: ""
+    };
+  }
+
   Object.keys(globalConfig.Miniserver).forEach(key => {
     if (!config.miniserver[key]) {
       let ms = {
@@ -40,11 +48,11 @@ function update_config(config) {
         subscribe: false,
         other_user: false,
         user: null,
-        pass: null
+        pass: null,
       };
       config.miniserver[key] = ms;
-    }
-    else { // exists, check/update each individual item
+
+    } else { // exists, check/update each individual item
       let ms = config.miniserver[key];
       if (!ms.mqtt_topic_ms) ms.mqtt_topic_ms = "loxone";
       if (!ms.publish_structure) ms.publish_structure = false;

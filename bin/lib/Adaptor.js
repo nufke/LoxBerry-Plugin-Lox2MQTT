@@ -45,9 +45,19 @@ Adaptor.prototype.get_command_from_topic = function(topic, data) {
   };
 };
 
+Adaptor.prototype.get_globalstates_key_from_uuid = function(uuid) {
+  return this.stateuuid2path[uuid];
+}
+
 Adaptor.prototype.get_topics_for_subscription = function() {
-  // topics: mqtt_topic_ms/serialnr/uuid/cmd, mqtt_topic_ms/serialnr/uuid/<subcontrol>/cmd
-  return [this.mqtt_topic_ms + '/+/+/cmd', this.mqtt_topic_ms + '/+/+/+/cmd'];
+  // subscribe to following topics:
+  // <mqtt_topic_ms>/<serialnr>/<uuid>/cmd
+  // <mqtt_topic_ms>/<serialnr>/<uuid>/<subcontrol>/cmd
+  // loxbuddy/<serialnr>/settings/cmd
+  return [
+    this.mqtt_topic_ms + '/+/+/cmd',
+    this.mqtt_topic_ms + '/+/+/+/cmd',
+    'loxbuddy/+/settings/cmd'];
 };
 
 Adaptor.prototype.abort = function() {
