@@ -35,13 +35,15 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
       lox_mqtt_adaptor.set_value_for_uuid(uuid, value);
 
       // check for notifications when push messaging serive registration was successful
-      if (pmsRegistered && serialnr && pmsRegistrations[serialnr]) {
+      if (pmsRegistered) {
         // check if event was a notification 
-        let key = lox_mqtt_adaptor.get_globalstates_key_from_uuid(uuid);
-        let token = pmsRegistrations[serialnr];
-
-        if ((key === 'globalstates/notifications') && token) {
-          pms.postMessage(value, token);
+        const key = lox_mqtt_adaptor.get_globalstates_key_from_uuid(uuid);
+        if (key === 'globalstates/notifications') {
+          Object.values(pmsRegistrations).forEach( item => {
+            if (item.ids.find( id => id == serialnr)) {
+              pms.postMessage(value, item, serialnr) }
+            }
+          );
         }
       }
     }
@@ -73,10 +75,11 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
 
       pms.getConfig(serialnr).then( status => {
         if (status === 'success') {
-          app.logger.info("PMS registration successful");
+          app.logger.info("Push Messaging Service registration successful");
           pmsRegistered = true;
         } else {
-          app.logger.error("PMS registration not successful. Check correctness of PMS url or token!");
+          app.logger.error("Push Messaging Service registration not successful. Check correctness of url or token!");
+          pmsRegistered = false;
         }
       });
     }
@@ -128,18 +131,26 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
       }
     }
 
-    // get settings if adapter exists and the serial number in the topic matches
-    if (lox_mqtt_adaptor && (topic.search("loxbuddy/" + serialnr + "/settings/cmd") > -1)) {
+    // register pmsToken for each app
+    if (lox_mqtt_adaptor && (topic.search(mqtt_topic_ms + "/settings/cmd") > -1)) {
       let settings = JSON.parse(message.toString())
-
-      if (settings.pms && !settings.pms.valid) {
-        settings.pms.serialnr.forEach( nr => delete pmsRegistrations[nr] );
+      if (settings.messagingService && (settings.messagingService.ids.length == 0)) {
+        delete pmsRegistrations[settings.messagingService.appId];
       }
-      if (settings.pms && settings.pms.valid) {
-        settings.pms.serialnr.forEach( nr => pmsRegistrations[nr] = settings.pms.token);
+      if (settings.messagingService && settings.messagingService.ids.length) {
+        pmsRegistrations[settings.messagingService.appId] = settings.messagingService;
       }
+      app.logger.info("Push Messaging Service registrations: " + JSON.stringify(Object.keys(pmsRegistrations).length));
+    }
 
-      app.logger.debug("PMS registrations: " + JSON.stringify(Object.keys(pmsRegistrations).length));
+    // test notifications
+    if (lox_mqtt_adaptor && (topic.search(mqtt_topic_ms + "/notifications") > -1)) {
+      let notification = JSON.parse(message.toString());
+      Object.values(pmsRegistrations).forEach( item => {
+        if (item.ids.find( id => id === serialnr)) {
+          pms.postMessage(notification, item, serialnr) }
+        }
+      );
     }
   });
 };

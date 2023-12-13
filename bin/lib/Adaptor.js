@@ -53,11 +53,13 @@ Adaptor.prototype.get_topics_for_subscription = function() {
   // subscribe to following topics:
   // <mqtt_topic_ms>/<serialnr>/<uuid>/cmd
   // <mqtt_topic_ms>/<serialnr>/<uuid>/<subcontrol>/cmd
-  // loxbuddy/<serialnr>/settings/cmd
+  // <mqtt_topic_ms>/settings/cmd
+  // <mqtt_topic_ms>/notifications (testing purpose only)
   return [
     this.mqtt_topic_ms + '/+/+/cmd',
     this.mqtt_topic_ms + '/+/+/+/cmd',
-    'loxbuddy/+/settings/cmd'];
+    this.mqtt_topic_ms + '/settings/cmd',
+    this.mqtt_topic_ms + '/notifications'];
 };
 
 Adaptor.prototype.abort = function() {
