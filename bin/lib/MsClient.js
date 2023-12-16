@@ -38,7 +38,7 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
       if (pmsRegistered) {
         // check if event was a notification 
         const key = lox_mqtt_adaptor.get_globalstates_key_from_uuid(uuid);
-        if (key === 'globalstates/notifications') {
+        if ((key === 'globalstates/notifications') && (Number(value.type) == 11)) {
           Object.values(pmsRegistrations).forEach( item => {
             if (item.ids.find( id => id == serialnr)) {
               pms.postMessage(value, item, serialnr) }
@@ -73,12 +73,12 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
     if (config.pms && config.pms.url.length && config.pms.key.length) {
       pms = new PMS(config, app);
 
-      pms.getConfig(serialnr).then( status => {
-        if (status === 'success') {
-          app.logger.info("Push Messaging Service registration successful");
+      pms.getConfig(serialnr).then( statusOk => {
+        if (statusOk) {
+          app.logger.info("PMS - Registration successful");
           pmsRegistered = true;
         } else {
-          app.logger.error("Push Messaging Service registration not successful. Check correctness of url or token!");
+          app.logger.error("PMS - Registration not successful. Check correctness of url or token!");
           pmsRegistered = false;
         }
       });
@@ -134,13 +134,15 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
     // register pmsToken for each app
     if (lox_mqtt_adaptor && (topic.search(mqtt_topic_ms + "/settings/cmd") > -1)) {
       let settings = JSON.parse(message.toString())
-      if (settings.messagingService && (settings.messagingService.ids.length == 0)) {
+      if (settings.messagingService && (settings.messagingService.ids.length == 0) && pmsRegistrations[settings.messagingService.appId]) {
         delete pmsRegistrations[settings.messagingService.appId];
+        app.logger.info("PMS - Unregistered App: " + settings.messagingService.appId);
       }
       if (settings.messagingService && settings.messagingService.ids.length) {
         pmsRegistrations[settings.messagingService.appId] = settings.messagingService;
+        app.logger.info("PMS - Registered App: " + settings.messagingService.appId);
       }
-      app.logger.info("Push Messaging Service registrations: " + JSON.stringify(Object.keys(pmsRegistrations).length));
+      app.logger.info("PMS - All registered Apps: " + (Object.keys(pmsRegistrations).length ? Object.keys(pmsRegistrations) : 'none' ));
     }
 
     // test notifications
@@ -148,9 +150,12 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
       let notification = JSON.parse(message.toString());
       Object.values(pmsRegistrations).forEach( item => {
         if (item.ids.find( id => id === serialnr)) {
-          pms.postMessage(notification, item, serialnr) }
+          pms.postMessage(notification, item, serialnr).then( statusOk => { 
+            if (statusOk) app.logger.info("PMS - Push notification send to AppID: " + item.appId);
+            else app.logger.info("PMS - Push notification failed to send to AppID: " + item.appId);
+          })
         }
-      );
+      });
     }
   });
 };
