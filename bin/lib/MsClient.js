@@ -38,7 +38,7 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
       if (pmsRegistered) {
         // check if event was a notification of type 10 (=normal message)
         const key = lox_mqtt_adaptor.get_globalstates_key_from_uuid(uuid);
-        if (key === 'globalstates/notifications') {
+        if (key === 'globalstates/notifications') { 
           let notification = JSON.parse(value.toString());
           if (Number(notification.type) == 10) {
           Object.values(pmsRegistrations).forEach( item => {

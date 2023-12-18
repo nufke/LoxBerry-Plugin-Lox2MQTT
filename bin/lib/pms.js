@@ -37,10 +37,10 @@ pms.prototype.postMessage = function(obj, target, serialnr) {
       type: String(obj.type),
       mac: obj.data.mac,
       lvl: String(obj.data.lvl),
-      uuid: obj.data.uuid ? obj.data.uuid : '',
+      uuid: obj.data.uuid ? obj.data.uuid : null,
       icon: target.url + '/assets/icons/icon-512x512.png',
       badge: target.url + '/assets/icons/icon-72x72bw.png',
-      click_action: target.url + '/app/home'
+      click_action: obj.data.uuid ? (target.url + '/app/home/' + obj.data.mac + '/' + obj.data.uuid) : (target.url + '/notifications')
     }
   };
   let headers = {
