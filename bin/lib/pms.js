@@ -25,25 +25,23 @@ pms.prototype.getConfig = function(serialnr) {
 }
 
 pms.prototype.postMessage = function(obj, target, serialnr) {
-
-  function replace(origObj){
-    let newObj = {}; 
-    Object.keys(origObj).forEach(key => {
-      typeof origObj[key] == 'object' ? replace(origObj[key]) : newObj[key]= String(origObj[key]);
-    });
-    return newObj;
-  }
-
   const url = this.config.pms.url + '/api/v1/send';
   let method = 'POST';
-  let data = replace(obj);
   let body = {
     token: target.token,
     data: { 
-      ...data,
+      uid: obj.uid,
+      ts: String(obj.ts),
+      title: obj.title,
+      message: obj.message,
+      type: String(obj.type),
+      mac: obj.data.mac,
+      lvl: String(obj.data.lvl),
+      uuid: obj.data.uuid ? obj.data.uuid : '',
       icon: target.url + '/assets/icons/icon-512x512.png',
       badge: target.url + '/assets/icons/icon-72x72bw.png',
-      click_action: target.url + '/app/home'  }
+      click_action: target.url + '/app/home'
+    }
   };
   let headers = {
     'Authorization': 'Bearer ' + this.config.pms.key,
@@ -58,7 +56,7 @@ pms.prototype.postMessage = function(obj, target, serialnr) {
     body:  JSON.stringify(body)
   })  
   .then(response => response.json()) // return any response type
-  .then(data => { this.app.logger.debug('"PMS response received: ' + JSON.stringify(data)); return data.status == 'success'; })
+  .then(data => { this.app.logger.debug("PMS response received: " + JSON.stringify(data)); return data.status == 'success'; })
   .catch(error => {
     this.app.logger.error("PMS server error: " + JSON.stringify(error));
   });

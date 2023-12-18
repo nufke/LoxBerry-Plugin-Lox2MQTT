@@ -36,14 +36,20 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
 
       // check for notifications when push messaging serive registration was successful
       if (pmsRegistered) {
-        // check if event was a notification 
+        // check if event was a notification of type 10 (=normal message)
         const key = lox_mqtt_adaptor.get_globalstates_key_from_uuid(uuid);
-        if ((key === 'globalstates/notifications') && (Number(value.type) == 11)) {
+        if (key === 'globalstates/notifications') {
+          let notification = JSON.parse(value.toString());
+          if (Number(notification.type) == 10) {
           Object.values(pmsRegistrations).forEach( item => {
             if (item.ids.find( id => id == serialnr)) {
-              pms.postMessage(value, item, serialnr) }
+              pms.postMessage(notification, item, serialnr).then( statusOk => { 
+                if (statusOk) app.logger.info("PMS - Push notification send to AppID: " + item.appId);
+                else app.logger.info("PMS - Push notification failed to send to AppID: " + item.appId);
+              })
             }
-          );
+          });
+        }
         }
       }
     }
