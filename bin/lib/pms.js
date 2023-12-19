@@ -1,7 +1,8 @@
 // Push Messaging Service (PMS)
-var pms = function(config, app) {
+var pms = function(config, app, adapter) {
   this.config = config;
   this.app = app;
+  this.adapter = adapter;
 };
 
 pms.prototype.getConfig = function(serialnr) {
@@ -25,6 +26,7 @@ pms.prototype.getConfig = function(serialnr) {
 }
 
 pms.prototype.postMessage = function(obj, target, serialnr) {
+  const controlExists = this.adapter.control_exists(obj.data.uuid);
   const url = this.config.pms.url + '/api/v1/send';
   let method = 'POST';
   let body = {
@@ -37,10 +39,18 @@ pms.prototype.postMessage = function(obj, target, serialnr) {
       type: String(obj.type),
       mac: obj.data.mac,
       lvl: String(obj.data.lvl),
-      uuid: obj.data.uuid ? obj.data.uuid : null,
+      uuid: obj.data.uuid,
       icon: target.url + '/assets/icons/icon-512x512.png',
       badge: target.url + '/assets/icons/icon-72x72bw.png',
-      click_action: obj.data.uuid ? (target.url + '/app/home/' + obj.data.mac + '/' + obj.data.uuid) : (target.url + '/notifications')
+      click_action: controlExists? (target.url + '/app/home/' + obj.data.mac + '/' + obj.data.uuid) : (target.url + '/notifications')
+    },
+    android: {
+      priority: 'high'
+    },
+    apns: {
+      headers: {
+        'apns-priority': '5'
+      }
     }
   };
   let headers = {

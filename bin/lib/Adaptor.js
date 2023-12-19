@@ -12,10 +12,10 @@ var Adaptor = function(app, data, mqtt_topic_ms) {
   this.mqtt_topic_ms = mqtt_topic_ms;
   this.serial_nr = this.structure.msInfo.serialNr;
   this.path2control = {};
+  this.controlList = [];
   this.stateuuid2path = {};
   this.ispushbutton = {};
   this.mqtt_structure = {};
-
   this._build_paths();
 };
 
@@ -28,6 +28,10 @@ Adaptor.prototype.set_value_for_uuid = function(uuid, value) {
 
 Adaptor.prototype.get_serialnr = function() {
   return this.serial_nr;
+};
+
+Adaptor.prototype.control_exists = function(uuid) {
+  return (this.controlList.findIndex( item => item == uuid) > -1);
 };
 
 Adaptor.prototype.get_command_from_topic = function(topic, data) {
@@ -93,6 +97,7 @@ Adaptor.prototype._add_control = function(control) {
   var serialnr = this.structure.msInfo.serialNr;
   var path = this.mqtt_topic_ms + '/' + serialnr + '/' + control.uuidAction;
   this.path2control[path] = control;
+  this.controlList.push(control.uuidAction);
 };
 
 module.exports = Adaptor;

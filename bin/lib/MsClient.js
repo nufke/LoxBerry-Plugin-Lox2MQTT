@@ -77,7 +77,7 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
     serialnr = lox_mqtt_adaptor.get_serialnr();
 
     if (config.pms && config.pms.url.length && config.pms.key.length) {
-      pms = new PMS(config, app);
+      pms = new PMS(config, app, lox_mqtt_adaptor);
 
       pms.getConfig(serialnr).then( statusOk => {
         if (statusOk) {
