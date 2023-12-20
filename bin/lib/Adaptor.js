@@ -58,12 +58,14 @@ Adaptor.prototype.get_topics_for_subscription = function() {
   // <mqtt_topic_ms>/<serialnr>/<uuid>/cmd
   // <mqtt_topic_ms>/<serialnr>/<uuid>/<subcontrol>/cmd
   // <mqtt_topic_ms>/settings/cmd
-  // <mqtt_topic_ms>/notifications (testing purpose only)
+  // <mqtt_topic_ms>/notification/cmd
+  // <mqtt_topic_ms>/pushmessage/cmd
   return [
     this.mqtt_topic_ms + '/+/+/cmd',
     this.mqtt_topic_ms + '/+/+/+/cmd',
     this.mqtt_topic_ms + '/settings/cmd',
-    this.mqtt_topic_ms + '/notifications'];
+    this.mqtt_topic_ms + '/notification/cmd',
+    this.mqtt_topic_ms + '/pushmessage/cmd'];
 };
 
 Adaptor.prototype.abort = function() {

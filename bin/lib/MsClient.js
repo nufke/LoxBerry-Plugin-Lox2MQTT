@@ -30,34 +30,38 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
     mqtt_topic_ms = 'loxone';
   }
 
+  function _push_message(uuid, value) {
+    // check if event was a notification of type 10 (=normal message)
+    const key = lox_mqtt_adaptor.get_globalstates_key_from_uuid(uuid);
+    if (key === 'globalstates/notifications') {
+      let notification = JSON.parse(value.toString());
+      if (Number(notification.type) == 10) {
+        Object.values(pmsRegistrations).forEach(item => {
+          if (item.ids.find(id => id == serialnr)) {
+            pms.postMessage(notification, item, serialnr).then(statusOk => {
+              if (statusOk) app.logger.info("PMS - Push notification send to AppID: " + item.appId);
+              else app.logger.info("PMS - Push notification failed to send to AppID: " + item.appId);
+            })
+          }
+        });
+      }
+    }
+  }
+
   function _update_event(uuid, value) {
     if (lox_mqtt_adaptor) {
       lox_mqtt_adaptor.set_value_for_uuid(uuid, value);
 
       // check for notifications when push messaging serive registration was successful
       if (pmsRegistered) {
-        // check if event was a notification of type 10 (=normal message)
-        const key = lox_mqtt_adaptor.get_globalstates_key_from_uuid(uuid);
-        if (key === 'globalstates/notifications') { 
-          let notification = JSON.parse(value.toString());
-          if (Number(notification.type) == 10) {
-          Object.values(pmsRegistrations).forEach( item => {
-            if (item.ids.find( id => id == serialnr)) {
-              pms.postMessage(notification, item, serialnr).then( statusOk => { 
-                if (statusOk) app.logger.info("PMS - Push notification send to AppID: " + item.appId);
-                else app.logger.info("PMS - Push notification failed to send to AppID: " + item.appId);
-              })
-            }
-          });
-        }
-        }
+        _push_message(uuid, value);
       }
     }
   };
 
   function _publish_topic(topic, data) {
     let payload = String(data);
-    let options = { retain: retain_message };
+    let options = { retain: retain_message }; // TODO make configurable
     app.logger.debug("MQTT Adaptor - Publish topic: " + topic + ", payload: " + payload);
     var fixedTopicName = topic.replace("+", "_").replace("#", "_")
     mqtt_client.publish(fixedTopicName, payload, options);
@@ -79,12 +83,20 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
     if (config.pms && config.pms.url.length && config.pms.key.length) {
       pms = new PMS(config, app, lox_mqtt_adaptor);
 
-      pms.getConfig(serialnr).then( statusOk => {
+      pms.checkRegistration(serialnr).then( statusOk => {
         if (statusOk) {
-          app.logger.info("PMS - Registration successful");
           pmsRegistered = true;
+          const pmsConfig = {
+            pms: {
+              url: config.pms.url,
+              key: config.pms.key,
+              id: serialnr
+            }
+          }
+          _publish_topic(mqtt_topic_ms + '/settings', JSON.stringify(pmsConfig));
+          app.logger.info("PMS - Access to push messaging service sucessful");
         } else {
-          app.logger.error("PMS - Registration not successful. Check correctness of url or token!");
+          app.logger.error("PMS - No access to push messaging service. Check correctness of url or token!");
           pmsRegistered = false;
         }
       });
@@ -127,7 +139,7 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
 
   mqtt_client.on('message', function(topic, message, packet) {
     // only send to Miniserver if adapter exists and the serial number in the topic matches
-    if (lox_mqtt_adaptor && (topic.search(mqtt_topic_ms + "/" + serialnr) > -1)) {
+    if (lox_mqtt_adaptor && message.length && (topic.search(mqtt_topic_ms + "/" + serialnr) > -1)) {
       let action = lox_mqtt_adaptor.get_command_from_topic(topic, message.toString());
       app.logger.debug("MQTT Adaptor - for miniserver, uuidAction: " + action.uuidAction + ", command: ", + action.command);
       if (config.miniserver[msid].subscribe) {
@@ -138,7 +150,7 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
     }
 
     // register pmsToken for each app
-    if (lox_mqtt_adaptor && (topic.search(mqtt_topic_ms + "/settings/cmd") > -1)) {
+    if (lox_mqtt_adaptor && message.length && (topic.search(mqtt_topic_ms + "/settings/cmd") > -1)) {
       let settings = JSON.parse(message.toString())
       if (settings.messagingService && (settings.messagingService.ids.length == 0) && pmsRegistrations[settings.messagingService.appId]) {
         delete pmsRegistrations[settings.messagingService.appId];
@@ -151,14 +163,18 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
       app.logger.info("PMS - All registered Apps: " + (Object.keys(pmsRegistrations).length ? Object.keys(pmsRegistrations) : 'none' ));
     }
 
-    // test notifications
-    if (lox_mqtt_adaptor && (topic.search(mqtt_topic_ms + "/notifications") > -1)) {
-      let notification = JSON.parse(message.toString());
+    // Subscribe to push messages send over MQTT
+    if (lox_mqtt_adaptor && message.length && (topic.search(mqtt_topic_ms + "/pushmessage/cmd") > -1)) {
+      let pushMessage = JSON.parse(message.toString());
+      if (Object.values(pmsRegistrations).length == 0) {
+        app.logger.info("PMS - Push message received from Miniserver with ID " + serialnr + " but no registered apps found!");
+        return;
+      }
       Object.values(pmsRegistrations).forEach( item => {
         if (item.ids.find( id => id === serialnr)) {
-          pms.postMessage(notification, item, serialnr).then( statusOk => { 
-            if (statusOk) app.logger.info("PMS - Push notification send to AppID: " + item.appId);
-            else app.logger.info("PMS - Push notification failed to send to AppID: " + item.appId);
+          pms.postMessage(pushMessage, item, serialnr).then( statusOk => { 
+            if (statusOk) app.logger.info("PMS - Push message send to AppID: " + item.appId);
+            else app.logger.info("PMS - Push message failed to send to AppID: " + item.appId);
           })
         }
       });

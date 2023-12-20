@@ -5,8 +5,8 @@ var pms = function(config, app, adapter) {
   this.adapter = adapter;
 };
 
-pms.prototype.getConfig = function(serialnr) {
-  let url = this.config.pms.url + '/api/v1/config';
+pms.prototype.checkRegistration = function(serialnr) {
+  let url = this.config.pms.url;
   let method = 'GET'
   let headers = {
     'Authorization': 'Bearer ' + this.config.pms.key,
@@ -27,7 +27,7 @@ pms.prototype.getConfig = function(serialnr) {
 
 pms.prototype.postMessage = function(obj, target, serialnr) {
   const controlExists = this.adapter.control_exists(obj.data.uuid);
-  const url = this.config.pms.url + '/api/v1/send';
+  const url = this.config.pms.url + '/send';
   let method = 'POST';
   let body = {
     token: target.token,
