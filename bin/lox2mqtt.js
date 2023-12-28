@@ -11,6 +11,7 @@ const logFile = `${directories.logdir}/lox2mqtt.log`;
 const globalConfigFile = `${directories.system_config}/general.json`;
 const globalPluginDbFile = `${directories.system_data}/plugindatabase.json`;
 const syslogDbFile = `${directories.syslogdir}/logs_sqlite.dat`;
+const loxbuddyConfigFile = `${directories.loxbuddy_config}/default.json`;
 
 const getPluginLogLevel = () => {
   let globalPluginDb = require(globalPluginDbFile);
@@ -24,6 +25,14 @@ const main = () => {
   let globalConfig = require(globalConfigFile);
   let logLevel = getPluginLogLevel();
   const logger = new Logger(syslogDbFile, logLevel);
+  let loxbuddyConfig = null;
+
+  try {
+    loxbuddyConfig = require(loxbuddyConfigFile);
+   }
+   catch (e) {
+    logger.warn('Lox2MQTT - No LoxBuddy configuration found.');
+   }
 
   if (!config.miniserver) {
     logger.info("Lox2MQTT - Missing or illegal configuration. Reinstall the plugin or report this issue.");
@@ -36,7 +45,7 @@ const main = () => {
 
   Object.keys(config.miniserver).forEach(key => {
       logger.info("Lox2MQTT - register Miniserver " + key);
-      ms_client[key] = new MsClient(app, config, globalConfig, key, mqtt_client);
+      ms_client[key] = new MsClient(app, config, globalConfig, loxbuddyConfig, key, mqtt_client);
   });
 };
 

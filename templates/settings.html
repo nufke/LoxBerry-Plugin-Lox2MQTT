@@ -88,26 +88,6 @@
         </div> <!-- v-if ms.other_user -->
       </div> <!-- v-for -->
       
-      <h3>Push Messaging Service (PMS) configuration</h3>
-
-      <div class="ui-field-contain">
-        <label :for="config.pms.url" class="col-fixed" style="min-width:15%">PMS URL</label>
-        <div class="ui-body-inherit">
-          <input type="text" required style="width:50%" :id="config.pms.url" v-model.trim="config.pms.url"
-            v-on:change="formadata_changed()">
-        </div>
-      </div>
-
-      <div class="ui-field-contain">
-        <label :for="config.pms.key" class="col-fixed" style="min-width:15%">PMS personal key</label>
-        <div class="ui-body-inherit">
-          <input type="text" required style="width:50%" :id="config.pms.key" v-model.trim="config.pms.key"
-            v-on:change="formadata_changed()">
-        </div>
-      </div>
-
-      <div style="height:15px"></div>
-
       <!-- Save and Apply button -->
       <div style="display:flex;align-items:center;justify-content:center;">
         <button :disabled='btn_disabled' class="ui-btn ui-btn-icon-right" data-inline="true"
@@ -155,7 +135,7 @@
             "and the LoxBerry MQTT Widget and publishes Miniserver state changes over MQTT. Furthermore, specific commands can be send " +
             "over MQTT to control the Miniserver directly."
         },
-        config: { miniserver: {}, pms: {} },
+        config: { miniserver: {} },
         sysconfig: { miniserver: {} },
         data_changed: false,
         data_saved: false,

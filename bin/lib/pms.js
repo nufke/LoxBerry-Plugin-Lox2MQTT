@@ -6,10 +6,10 @@ var pms = function(config, app, adapter) {
 };
 
 pms.prototype.checkRegistration = function(serialnr) {
-  let url = this.config.pms.url;
+  let url = this.config.messaging.url;
   let method = 'GET'
   let headers = {
-    'Authorization': 'Bearer ' + this.config.pms.key,
+    'Authorization': 'Bearer ' + this.config.messaging.key,
     'Accept': 'application/json',
     'Content-Type': 'application/json',
     'id': serialnr
@@ -27,7 +27,7 @@ pms.prototype.checkRegistration = function(serialnr) {
 
 pms.prototype.postMessage = function(obj, target, serialnr) {
   const controlExists = this.adapter.control_exists(obj.data.uuid);
-  const url = this.config.pms.url + '/send';
+  const url = this.config.messaging.url + '/send';
   let method = 'POST';
   let body = {
     token: target.token,
@@ -54,7 +54,7 @@ pms.prototype.postMessage = function(obj, target, serialnr) {
     }
   };
   let headers = {
-    'Authorization': 'Bearer ' + this.config.pms.key,
+    'Authorization': 'Bearer ' + this.config.messaging.key,
     'Accept': 'application/json',
     'Content-Type': 'application/json',
     'id': serialnr
@@ -66,9 +66,9 @@ pms.prototype.postMessage = function(obj, target, serialnr) {
     body:  JSON.stringify(body)
   })  
   .then(response => response.json()) // return any response type
-  .then(data => { this.app.logger.debug("PMS response received: " + JSON.stringify(data)); return data.status == 'success'; })
+  .then(data => { this.app.logger.debug("Messaging - Response received: " + JSON.stringify(data)); return data.status == 'success'; })
   .catch(error => {
-    this.app.logger.error("PMS server error: " + JSON.stringify(error));
+    this.app.logger.error("Messaging - Server error: " + JSON.stringify(error));
   });
 };
 

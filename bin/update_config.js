@@ -30,14 +30,6 @@ function update_config(config) {
     config.miniserver = {};
   }
 
-  if (!config.pms) {
-    config['pms'] = 
-    {
-      url: "",
-      key: ""
-    };
-  }
-
   Object.keys(globalConfig.Miniserver).forEach(key => {
     if (!config.miniserver[key]) {
       let ms = {
