@@ -57,15 +57,12 @@ Adaptor.prototype.get_topics_for_subscription = function() {
   // subscribe to following topics:
   // <mqtt_topic_ms>/<serialnr>/<uuid>/cmd
   // <mqtt_topic_ms>/<serialnr>/<uuid>/<subcontrol>/cmd
-  // <mqtt_topic_ms>/settings/cmd
-  // <mqtt_topic_ms>/notification/cmd
-  // <mqtt_topic_ms>/pushmessage/cmd
+  // loxbuddy/cmd (used for PMS configuration, push messages and notifications)
   return [
     this.mqtt_topic_ms + '/+/+/cmd',
     this.mqtt_topic_ms + '/+/+/+/cmd',
-    this.mqtt_topic_ms + '/settings/cmd',
-    this.mqtt_topic_ms + '/notification/cmd',
-    this.mqtt_topic_ms + '/pushmessage/cmd'];
+    'loxbuddy/cmd'
+  ]
 };
 
 Adaptor.prototype.abort = function() {

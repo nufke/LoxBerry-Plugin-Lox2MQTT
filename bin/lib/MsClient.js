@@ -16,6 +16,7 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
   var pmsRegistered = false;
   var pmsRegistrations = {};
   var serialnr = undefined;
+  var loxbuddyTopic = 'loxbuddy'; // TODO get via config
 
   // Check if we already have an MQTT client, otherwise create one
   if (!mqtt_client) {
@@ -97,15 +98,15 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
               id: serialnr
             }
           }
-          _publish_topic(mqtt_topic_ms + '/settings', JSON.stringify(pmsConfig));
-          app.logger.info("Messaging - Access to push messaging service sucessful");
+          _publish_topic(loxbuddyTopic, JSON.stringify(pmsConfig));
+          app.logger.info("Messaging - Access to LoxBuddy Messaging Service sucessful");
         } else {
-          app.logger.error("Messaging - No access to push messaging service. Check correctness of url or token!");
+          app.logger.error("Messaging - Access to LoxBuddy Messaging Service failed. Check correctness of url or token!");
           pmsRegistered = false;
         }
       });
     } else {
-      app.logger.warn("Messaging - No valid messaging service found.");
+      app.logger.warn("Messaging - No LoxBuddy Messaging Service configuration found.");
       pmsRegistered = false;
     }
 
@@ -157,34 +158,38 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
     }
 
     // register pmsToken for each app
-    if (lox_mqtt_adaptor && message.length && (topic.search(mqtt_topic_ms + "/settings/cmd") > -1)) {
-      let settings = JSON.parse(message.toString())
-      if (settings.messagingService && (settings.messagingService.ids.length == 0) && pmsRegistrations[settings.messagingService.appId]) {
-        delete pmsRegistrations[settings.messagingService.appId];
-        app.logger.info("Messaging - Unregistered App: " + settings.messagingService.appId);
-      }
-      if (settings.messagingService && settings.messagingService.ids.length) {
-        pmsRegistrations[settings.messagingService.appId] = settings.messagingService;
-        app.logger.info("Messaging - Registered App: " + settings.messagingService.appId);
-      }
-      app.logger.info("Messaging - All registered Apps: " + (Object.keys(pmsRegistrations).length ? Object.keys(pmsRegistrations) : 'none' ));
-    }
+    // TODO: get topic prefix via LoxBuddy config
+    if (lox_mqtt_adaptor && message.length && (topic.search( loxbuddyTopic + '/cmd') > -1)) {
+      let resp = JSON.parse(message.toString())
 
-    // Subscribe to push messages send over MQTT
-    if (lox_mqtt_adaptor && message.length && (topic.search(mqtt_topic_ms + "/pushmessage/cmd") > -1)) {
-      let pushMessage = JSON.parse(message.toString());
-      if (Object.values(pmsRegistrations).length == 0) {
-        app.logger.info("Messaging - Push message received from Miniserver with ID " + serialnr + " but no registered apps found!");
-        return;
+      if (resp.messagingService && (resp.messagingService.ids.length == 0) && pmsRegistrations[resp.messagingService.appId]) {
+        delete pmsRegistrations[resp.messagingService.appId];
+        app.logger.info("Messaging - Unregistered App: " + resp.messagingService.appId);
       }
-      Object.values(pmsRegistrations).forEach( item => {
-        if (item.ids.find( id => id === serialnr)) {
-          pms.postMessage(pushMessage, item, serialnr).then( statusOk => { 
-            if (statusOk) app.logger.info("Messaging - Push message send to AppID: " + item.appId);
-            else app.logger.info("Messaging - Push message failed to send to AppID: " + item.appId);
-          })
+
+      if (resp.messagingService && resp.messagingService.ids.length) {
+        pmsRegistrations[resp.messagingService.appId] = resp.messagingService;
+        app.logger.info("Messaging - Registered App: " + resp.messagingService.appId);
+      }
+
+      if (resp.messagingService) {
+        app.logger.info("Messaging - All registered Apps: " + (Object.keys(pmsRegistrations).length ? Object.keys(pmsRegistrations) : 'none' ));
+      }
+
+      if (resp.pushMessage) {
+        if (Object.values(pmsRegistrations).length == 0) {
+          app.logger.info("Messaging - Push message received from Miniserver with ID " + serialnr + " but no registered apps found!");
+          return;
         }
-      });
+        Object.values(pmsRegistrations).forEach( item => {
+          if (item.ids.find( id => id === serialnr)) {
+            pms.postMessage(resp.pushMessage, item, serialnr).then( statusOk => { 
+              if (statusOk) app.logger.info("Messaging - Push message send to AppID: " + item.appId);
+              else app.logger.info("Messaging - Push message failed to send to AppID: " + item.appId);
+            })
+          }
+        });
+      }
     }
   });
 };

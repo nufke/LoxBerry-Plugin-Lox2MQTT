@@ -57,5 +57,5 @@ function update_config(config) {
     }
   });
 
-  fs.writeFileSync(process.env.LBPCONFIG + '/lox2mqtt/default.json', JSON.stringify(config));
+  fs.writeFileSync(configFile, JSON.stringify(config));
 }
