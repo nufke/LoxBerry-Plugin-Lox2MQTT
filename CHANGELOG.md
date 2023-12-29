@@ -1,5 +1,10 @@
 # Version History
 
+## v0.6.1 (BETA)
+
+ * fix: incoming MQTT control commands were not relayed to miniserver(s) 
+ * align notification and push messages API using MQTT
+
 ## v0.6.0 (BETA)
 
  * remove dependency to node-lox-structure-file

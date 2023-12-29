@@ -46,6 +46,14 @@ Adaptor.prototype.get_globalstates_key_from_uuid = function(uuid) {
   return this.stateuuid2path[uuid];
 }
 
+Adaptor.prototype.get_globalstates_uuid_from_key = function(value) {
+  return Object.keys(this.stateuuid2path).find(uuid => this.stateuuid2path[uuid] === value );
+}
+
+Adaptor.prototype.is_notification = function(uuid) {
+  return (this.get_globalstates_key_from_uuid(uuid) === 'globalstates/notifications');
+}
+
 Adaptor.prototype.get_topics_for_subscription = function() {
   // subscribe to following topics:
   // <mqtt_topic_ms>/<serialnr>/<uuid>/cmd
@@ -75,12 +83,12 @@ Adaptor.prototype._build_paths = function() {
 
   this.path2control['globalstates'] = this.structure.globalStates;
   Object.keys(this.structure.globalStates).forEach(function(key) {
-    this.stateuuid2path[this.structure.globalStates[key].uuid] = 'globalstates/' + key;
+    this.stateuuid2path[this.structure.globalStates[key]] = 'globalstates/' + key;
   }, this);
 };
 
 Adaptor.prototype._add_control = function(control) {
-  var path = this.mqtt_topic_ms + '/' + this.serialnr + '/' + control.uuidAction;
+  var path = this.mqtt_topic_ms + '/' + this.serial_nr + '/' + control.uuidAction;
   this.path2control[path] = control;
   this.controlList.push(control.uuidAction);
 };
