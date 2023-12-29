@@ -73,12 +73,12 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
   lox_ms_client.on('update_event_daytimer', _update_event);
   lox_ms_client.on('update_event_weather', _update_event);
 
-  lox_ms_client.on('get_structure_file', async function(data) {
+  lox_ms_client.on('get_structure_file', async function(structure) {
     if (lox_mqtt_adaptor) {
       lox_mqtt_adaptor.abort();
     }
 
-    lox_mqtt_adaptor = new Adaptor(app, data, mqtt_topic_ms);
+    lox_mqtt_adaptor = new Adaptor(structure, mqtt_topic_ms);
     serialnr = lox_mqtt_adaptor.get_serialnr();
 
     if (loxbuddyConfig && 
@@ -88,12 +88,12 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
 
       pms = new PMS(loxbuddyConfig, app, lox_mqtt_adaptor);
 
-      pms.checkRegistration(serialnr).then( statusOk => {
-        if (statusOk) {
+      pms.checkRegistration(serialnr).then( resp => {
+        if (resp.status == "success") {
           pmsRegistered = true;
           const pmsConfig = {
-            pms: {
-              url: loxbuddyConfig.messaging.url,
+            messaging: {
+              url: resp.message.url,
               key: loxbuddyConfig.messaging.key,
               id: serialnr
             }
@@ -101,7 +101,7 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
           _publish_topic(loxbuddyTopic, JSON.stringify(pmsConfig));
           app.logger.info("Messaging - Access to LoxBuddy Messaging Service sucessful");
         } else {
-          app.logger.error("Messaging - Access to LoxBuddy Messaging Service failed. Check correctness of url or token!");
+          app.logger.error("Messaging - Access to LoxBuddy Messaging Service failed. Check correctness of messaging URL or personal token!");
           pmsRegistered = false;
         }
       });
@@ -131,12 +131,6 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
     });
 
     lox_mqtt_adaptor.publish_structure();
-  });
-
-  app.on('exit', function(code) {
-    if (lox_mqtt_adaptor) {
-      lox_mqtt_adaptor.abort();
-    }
   });
 
   mqtt_client.on('connect', function(conack) {

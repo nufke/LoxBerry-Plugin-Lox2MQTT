@@ -19,7 +19,7 @@ pms.prototype.checkRegistration = function(serialnr) {
     headers: headers
   })
     .then(response => response.json()) // return any response type
-    .then(data => { return data.status == 'success'; })
+    .then(data => data )
     .catch(error => {
       this.app.logger.error("Push Messaging Service server error: " + JSON.stringify(error));
     });

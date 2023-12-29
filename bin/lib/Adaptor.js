@@ -1,14 +1,8 @@
 const util = require('util');
 const events = require('events');
-const Structure = require("node-lox-structure-file");
 
-var Adaptor = function(app, data, mqtt_topic_ms) {
-  this.data = data; // raw structure;
-  this.structure = Structure.create_from_json(data,
-    function(value) {
-      app.logger.warn("MQTT Adaptor - Undefined control found in Loxone Structure: " +  JSON.stringify(value));
-    }
-  );
+var Adaptor = function(structure, mqtt_topic_ms) {
+  this.structure = structure;
   this.mqtt_topic_ms = mqtt_topic_ms;
   this.serial_nr = this.structure.msInfo.serialNr;
   this.path2control = {};
@@ -22,7 +16,6 @@ var Adaptor = function(app, data, mqtt_topic_ms) {
 util.inherits(Adaptor, events.EventEmitter);
 
 Adaptor.prototype.set_value_for_uuid = function(uuid, value) {
-  this.structure.set_value_for_uuid(uuid, value);
   this.emit('publish_state', this.mqtt_topic_ms + '/' + this.serial_nr + '/' + uuid, value);
 };
 
@@ -65,23 +58,17 @@ Adaptor.prototype.get_topics_for_subscription = function() {
   ]
 };
 
-Adaptor.prototype.abort = function() {
-  this.structure.removeAllListeners();
-  this.structure = undefined;
-  this.removeAllListeners();
-};
-
 Adaptor.prototype.publish_structure = function() { // NOTE: we publish the original structure
-  this.emit('publish_structure', this.mqtt_topic_ms + '/' + this.serial_nr + '/structure', JSON.stringify(this.data));
+  this.emit('publish_structure', this.mqtt_topic_ms + '/' + this.serial_nr + '/structure', JSON.stringify(this.structure));
 };
 
 Adaptor.prototype._build_paths = function() {
-  Object.keys(this.structure.controls.items).forEach(function(key) {
-    var control = this.structure.controls.items[key];
+  Object.keys(this.structure.controls).forEach(function(key) {
+    var control = this.structure.controls[key];
     this._add_control(control);
     if (control.subControls !== undefined) {
-      Object.keys(control.subControls.items).forEach(function(sub_key) {
-        this._add_control(control.subControls.items[sub_key]);
+      Object.keys(control.subControls).forEach(function(sub_key) {
+        this._add_control(control.subControls[sub_key]);
       }, this);
     }
   }, this);
@@ -93,8 +80,7 @@ Adaptor.prototype._build_paths = function() {
 };
 
 Adaptor.prototype._add_control = function(control) {
-  var serialnr = this.structure.msInfo.serialNr;
-  var path = this.mqtt_topic_ms + '/' + serialnr + '/' + control.uuidAction;
+  var path = this.mqtt_topic_ms + '/' + this.serialnr + '/' + control.uuidAction;
   this.path2control[path] = control;
   this.controlList.push(control.uuidAction);
 };

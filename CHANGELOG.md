@@ -1,5 +1,10 @@
 # Version History
 
+## v0.6.0 (BETA)
+
+ * remove dependency to node-lox-structure-file
+ * introduce push messaging service for LoxBuddy App
+
 ## v0.5.1 (BETA)
 
  * fix: keep alive when MQTT server is unreachable
