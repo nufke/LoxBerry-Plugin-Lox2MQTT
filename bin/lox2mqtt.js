@@ -44,8 +44,12 @@ const main = () => {
   let ms_client = {}
 
   Object.keys(config.miniserver).forEach(key => {
+    if (config.miniserver[key].enabled) {
       logger.info("Lox2MQTT - register Miniserver " + key);
       ms_client[key] = new MsClient(app, config, globalConfig, loxbuddyConfig, key, mqtt_client);
+    } else {
+      logger.info("Lox2MQTT - Miniserver " + key + ' disabled in MQTT communucation');
+    }
   });
 };
 

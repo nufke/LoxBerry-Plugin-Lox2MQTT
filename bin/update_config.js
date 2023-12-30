@@ -33,6 +33,7 @@ function update_config(config) {
   Object.keys(globalConfig.Miniserver).forEach(key => {
     if (!config.miniserver[key]) {
       let ms = {
+        enabled: true,
         mqtt_topic_ms: "loxone",
         publish_structure: false,
         publish_states: false,
@@ -46,6 +47,7 @@ function update_config(config) {
 
     } else { // exists, check/update each individual item
       let ms = config.miniserver[key];
+      if (!ms.enabled) ms.enabled = true;
       if (!ms.mqtt_topic_ms) ms.mqtt_topic_ms = "loxone";
       if (!ms.publish_structure) ms.publish_structure = false;
       if (!ms.publish_states) ms.publish_states = false;

@@ -1,5 +1,10 @@
 # Version History
 
+## v0.6.3 (BETA)
+
+ * fix: plugin restart s
+ * option to enable miniserver in MQTT communication
+
 ## v0.6.2 (BETA)
 
  * fix: generate Loxone-specific UUID 

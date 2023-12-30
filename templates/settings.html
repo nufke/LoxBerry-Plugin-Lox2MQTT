@@ -18,13 +18,30 @@
         </div>
 
         <div class="ui-field-contain">
+          <fieldset class="ui-controlgroup ui-controlgroup-vertical ui-corner-all" data-role="controlgroup">
+            <div class="ui-controlgroup-label" role="heading">
+              <legend>Enable</legend>
+            </div>
+            <div class="ui-controlgroup-controls">
+              <div class="ui-checkbox">
+                <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-first-child ui-last-child"
+                  :class="{ 'ui-checkbox-on': ms.enabled==true, 'ui-checkbox-off': ms.enabled==false }"
+                  :for=`enabled-${index}`>Enable miniserver in MQTT communication</label>
+                <input type="checkbox" :id=`enabled-${index}` v-model="ms.enabled"
+                  v-on:change="formadata_changed();">
+              </div>
+              <p class="hint"><b>NOTE:</b> Miniserver(s) configured as Client can be controlled via a Gateway Minisever and do not need to be enabled explicitly.</p>
+            </div>
+          </fieldset>
+        </div>
+        <div v-if="ms.enabled" class="ui-field-contain">
           <label for="ms.mqtt_topic_ms" class="col-fixed" style="min-width:15%">Miniserver topic name</label>
           <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
             <input type="text" style="width:50%" id="ms.mqtt_topic_ms" v-model.trim="ms.mqtt_topic_ms"
               v-on:change="formadata_changed()">
           </div>
         </div>
-        <div class="ui-field-contain">
+        <div v-if="ms.enabled" class="ui-field-contain">
           <fieldset class="ui-controlgroup ui-controlgroup-vertical ui-corner-all" data-role="controlgroup">
             <div class="ui-controlgroup-label" role="heading">
               <legend>Options</legend>

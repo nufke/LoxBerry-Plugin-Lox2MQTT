@@ -12,7 +12,7 @@ $ajax = empty($ajax) ? $_GET['ajax'] : $ajax;
 
 if ($ajax == 'restart_lox2mqtt') {
   print "restart_lox2mqtt...";
-  exec("cd $lbhomedir/bin/plugins/lox2mqtt; npm run stop; sleep 1; npm run start");
+  exec("cd $lbhomedir/bin/plugins/lox2mqtt; npm run restart");
 } elseif ($ajax == 'get_lox2mqtt_pid') {
   $data['pid'] = trim(`pgrep Lox2MQTT`);
   $data['pid'] = $data['pid'] != 0 ? $data['pid'] : null;
