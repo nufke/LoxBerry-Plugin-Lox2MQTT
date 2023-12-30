@@ -1,5 +1,11 @@
 # Version History
 
+## v0.6.2 (BETA)
+
+ * fix: generate Loxone-specific UUID 
+ * fix: remove dependency of crypto library
+ * fix: formatting of notifications
+
 ## v0.6.1 (BETA)
 
  * fix: incoming MQTT control commands were not relayed to miniserver(s) 
