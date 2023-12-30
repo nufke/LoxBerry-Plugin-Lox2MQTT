@@ -12,6 +12,8 @@ Use the LoxBerry plugin installation procedure.
 
 Use the LoxBerry plugin webpage to configure the communication using MQTT. The plugin detects and lists the available Miniservers. For each Miniserver, the following configuration options are available:
 
+  * **Enable Miniserver in MQTT communication**: Enable or disable Miniserver in MQTT communication (default: enabled). Note that Miniserver(s) configured as Client can be controlled via a Gateway Miniserver and do not need to be enabled explicitly.
+
   * **Miniserver topic name**: MQTT topic name used when publishing control state changes and subscribing to Miniserver control commands (default: loxone)
 
   * **Options**:

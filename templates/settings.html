@@ -26,7 +26,7 @@
               <div class="ui-checkbox">
                 <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-first-child ui-last-child"
                   :class="{ 'ui-checkbox-on': ms.enabled==true, 'ui-checkbox-off': ms.enabled==false }"
-                  :for=`enabled-${index}`>Enable miniserver in MQTT communication</label>
+                  :for=`enabled-${index}`>Enable Miniserver in MQTT communication</label>
                 <input type="checkbox" :id=`enabled-${index}` v-model="ms.enabled"
                   v-on:change="formadata_changed();">
               </div>
