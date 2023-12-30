@@ -2,7 +2,7 @@
 
 ## v0.6.3 (BETA)
 
- * fix: plugin restart s
+ * fix: plugin restart procedure
  * option to enable miniserver in MQTT communication
 
 ## v0.6.2 (BETA)
