@@ -7,7 +7,11 @@
 
     <p v-if="config.miniserver">This section lists the available Miniservers. Miniserver not listed? Configure your
       Miniservers <a href="/admin/system/miniserver.cgi">here</a>.</p>
-    <div v-if="config.miniserver">
+
+    <div v-if="!msAvailable">
+      <p style="color:red">No Miniserver(s) found!</p>
+    </div>
+    <div v-if="msAvailable">
       <div id="vforid" v-for="(ms, index) in config.miniserver">
 
         <div v-if="sysconfig.miniserver[index].Name">
@@ -129,8 +133,11 @@
         Error saving data.
       </div>
 
-    </div> <!-- v-if -->
-    <p v-else>We could not find the Lox2MQTT configuration. Check the configuration file or reinstall the plugin.</p>
+    </div>
+
+    <div v-if="!config">
+      <p>We could not find the Lox2MQTT configuration. Check the configuration file or reinstall the plugin.</p>
+    </div>
 
   </div>
 </TMPL_IF>
@@ -154,6 +161,7 @@
         },
         config: { miniserver: {} },
         sysconfig: { miniserver: {} },
+        msAvailable: 0,
         data_changed: false,
         data_saved: false,
         data_save_error: false,
@@ -216,6 +224,9 @@
           })
           .then(data => {
             this.sysconfig.miniserver = data;
+            Object.keys(data).forEach( key => {
+              this.msAvailable += (data[key].Ipaddress.length > 0);
+            });
           })
       },
 
@@ -231,7 +242,7 @@
           .then(data => {
             this.pid = data;
           });
-      }
+      },
     }
   }
 
