@@ -29,13 +29,13 @@ const main = () => {
 
   try {
     loxbuddyConfig = require(loxbuddyConfigFile);
-   }
-   catch (e) {
+  }
+  catch (e) {
     logger.warn('Lox2MQTT - No LoxBuddy configuration found.');
-   }
+  }
 
   if (!config.miniserver) {
-    logger.info("Lox2MQTT - Missing or illegal configuration. Reinstall the plugin or report this issue.");
+    logger.error("Lox2MQTT - Missing or illegal configuration. Reinstall the plugin or report this issue.");
     return;
   }
 
@@ -44,11 +44,13 @@ const main = () => {
   let ms_client = {}
 
   Object.keys(config.miniserver).forEach(key => {
-    if (config.miniserver[key].enabled) {
+    if ( config.miniserver[key].enabled && 
+         (globalConfig.Miniserver[key].Ipaddress.length > 0) && 
+         (config.miniserver[key].mqtt_topic_ms.length > 0) ) {
       logger.info("Lox2MQTT - register Miniserver " + key);
       ms_client[key] = new MsClient(app, config, globalConfig, loxbuddyConfig, key, mqtt_client);
     } else {
-      logger.info("Lox2MQTT - Miniserver " + key + ' disabled in MQTT communucation');
+      logger.info("Lox2MQTT - Miniserver " + key + ' disabled in MQTT communication.');
     }
   });
 };
