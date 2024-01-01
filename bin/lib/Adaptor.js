@@ -15,6 +15,10 @@ var Adaptor = function(structure, mqtt_topic_ms) {
 
 util.inherits(Adaptor, events.EventEmitter);
 
+Adaptor.prototype.clear = function() {
+  this.structure = undefined;
+};
+
 Adaptor.prototype.set_value_for_uuid = function(uuid, value) {
   this.emit('publish_state', this.mqtt_topic_ms + '/' + this.serial_nr + '/' + uuid, value);
 };

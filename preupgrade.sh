@@ -25,9 +25,10 @@ mkdir -p /tmp/$PTEMPDIR\_upgrade
 mkdir -p /tmp/$PTEMPDIR\_upgrade/log
 mkdir -p /tmp/$PTEMPDIR\_upgrade/config
 
-echo "<INFO> Backing up existing config and log files..."
+echo "<INFO> Backing up existing config, data and log files..."
 cp -p -v -r $PLOG /tmp/$PTEMPDIR\_upgrade/log
 cp -p -v -r $PCONFIG /tmp/$PTEMPDIR\_upgrade/config
+cp -p -v -r $PDATA /tmp/$PTEMPDIR\_upgrade/data
 
 echo "<INFO> Stop plugin..."
 npm --prefix $PBIN run kill

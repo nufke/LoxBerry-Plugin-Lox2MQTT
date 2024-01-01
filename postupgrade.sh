@@ -20,9 +20,10 @@ PCONFIG=$LBPCONFIG/$PDIR
 PSBIN=$LBPSBIN/$PDIR
 PBIN=$LBPBIN/$PDIR
 
-echo "<INFO> Copy back existing config and log files..."
+echo "<INFO> Copy back existing config, data and log files..."
 cp -p -v -r /tmp/$PTEMPDIR\_upgrade/log/$PDIR/* $PLOG
 cp -p -v -r /tmp/$PTEMPDIR\_upgrade/config/$PDIR/* $PCONFIG
+cp -p -v -r /tmp/$PTEMPDIR\_upgrade/data/$PDIR/* $PDATA
 
 echo "<INFO> Remove temporary folders"
 rm -r /tmp/$PTEMPDIR\_upgrade/log

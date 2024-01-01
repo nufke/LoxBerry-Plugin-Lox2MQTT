@@ -3,6 +3,8 @@ const WebSocket = require("./WebSocketAPI.js");
 const Adaptor = require("./Adaptor.js");
 const MqttClient = require("./mqtt_builder.js");
 const PMS = require("./pms.js");
+const directories = require('./directories');
+var fcache = require('flat-cache')
 
 var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_client) {
   if (!globalConfig.Miniserver[msid]) {
@@ -14,13 +16,21 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
   var lox_mqtt_adaptor = undefined;
   var pms = undefined; // push messaging service
   var pmsRegistered = false;
-  var pmsRegistrations = {};
   var serialnr = undefined;
   var loxbuddyTopic = 'loxbuddy'; // TODO get via config
 
   // Check if we already have an MQTT client, otherwise create one
   if (!mqtt_client) {
     mqtt_client = MqttClient(globalConfig, app);
+  }
+
+  var cache = fcache.load('data', directories.data);
+  var fromCache = cache.getKey('pmsRegistrations');
+  var pmsRegistrations = fromCache ? fromCache : {};
+
+  if (Object.keys(pmsRegistrations).length) {
+    let keys = Object.keys(pmsRegistrations);
+    app.logger.info("Messaging - Loaded registered Apps from cache: " + keys );
   }
 
   // check configuration variables
@@ -94,7 +104,7 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
 
   lox_ms_client.on('get_structure_file', async function(structure) {
     if (lox_mqtt_adaptor) {
-      lox_mqtt_adaptor.abort();
+      lox_mqtt_adaptor.clear();
     }
 
     lox_mqtt_adaptor = new Adaptor(structure, mqtt_topic_ms);
@@ -158,7 +168,7 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
     }
   });
 
-  mqtt_client.on('message', function(topic, message, packet) {
+  mqtt_client.on('message', async function(topic, message, packet) {
     // only send to Miniserver if adapter exists and the serial number in the topic matches
     if (lox_mqtt_adaptor && message.length && (topic.search(mqtt_topic_ms + "/" + serialnr) > -1)) {
       let action = lox_mqtt_adaptor.get_command_from_topic(topic, message.toString());
@@ -186,15 +196,19 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
       }
 
       if (resp.messagingService) {
-        app.logger.info("Messaging - All registered Apps: " + (Object.keys(pmsRegistrations).length ? Object.keys(pmsRegistrations) : 'none' ));
+        let keys = Object.keys(pmsRegistrations);
+        app.logger.info("Messaging - All registered Apps: " + (keys.length ? keys : 'none' ));
+        cache.setKey('pmsRegistrations', pmsRegistrations);
+        cache.save();
       }
 
       if (resp.pushMessage) {
-        if (Object.values(pmsRegistrations).length == 0) {
+        let values = Object.values(pmsRegistrations);
+        if (values.length == 0) {
           app.logger.info("Messaging - Push message received over MQTT associated to  Miniserver with ID " + serialnr + " but no registered apps found!");
           return;
         }
-        Object.values(pmsRegistrations).forEach( item => {
+        values.forEach( item => {
           if (item.ids.find( id => id === serialnr)) {
             pms.postMessage(resp.pushMessage, item, serialnr).then( statusOk => { 
               if (statusOk) app.logger.info("Messaging - Push message send to AppID: " + item.appId);
@@ -213,6 +227,7 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
       }
     }
   });
+
 };
 
 module.exports = MsClient;

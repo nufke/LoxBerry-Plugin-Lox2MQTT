@@ -1,5 +1,10 @@
 # Version History
 
+## v0.6.4 (BETA)
+
+ * fix: proper reinit of adapter when receiving new structure file
+ * save/restore push messaging information of registered apps
+
 ## v0.6.3 (BETA)
 
  * fix: plugin restart procedure
