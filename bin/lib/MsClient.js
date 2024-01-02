@@ -41,8 +41,7 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
     mqtt_topic_ms = 'loxone';
   }
 
-  function _push_message(value) {
-    let obj = JSON.parse(value.toString());
+  function _push_message(obj) {
     Object.values(pmsRegistrations).forEach(item => {
       if (item.ids.find(id => id == serialnr)) {
         pms.postMessage(obj, item, serialnr).then(statusOk => {
@@ -81,10 +80,14 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
       const isNotification = lox_mqtt_adaptor.is_notification(uuid);
       const data = isNotification ? JSON.stringify(_reformat_notification(JSON.parse(value))) : value;
       lox_mqtt_adaptor.set_value_for_uuid(uuid, data);
-
       // check for notifications when push messaging serive registration was successful
       if (pmsRegistered && isNotification) {
-        _push_message(data);
+        let pushMessage = JSON.parse(data);
+        if (pushMessage.message && pushMessage.title) {
+          _push_message(pushMessage);
+        } else {
+          app.logger.info("Messaging - Incomplete Push Message received. Check title and message of the Push Message."); 
+        }
       }
     }
   }
@@ -203,6 +206,10 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
       }
 
       if (resp.pushMessage) {
+        if (!resp.pushMessage.title || !resp.pushMessage.message) {
+          app.logger.info("Messaging - Incomplete Push Message received. Check title and message of the Push Message."); 
+          return;
+        }
         let values = Object.values(pmsRegistrations);
         if (values.length == 0) {
           app.logger.info("Messaging - Push message received over MQTT associated to  Miniserver with ID " + serialnr + " but no registered apps found!");
@@ -213,15 +220,19 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
             pms.postMessage(resp.pushMessage, item, serialnr).then( statusOk => { 
               if (statusOk) app.logger.info("Messaging - Push message send to AppID: " + item.appId);
               else app.logger.info("Messaging - Push message failed to send to AppID: " + item.appId);
-            })
+            });
           }
         });
       }
 
       if (resp.notification && config.miniserver[msid].publish_states) {
-        const notification = _reformat_notification(resp.notification);
-        const uuid = lox_mqtt_adaptor.get_globalstates_uuid_from_key('globalstates/notifications');
-        _publish_topic(mqtt_topic_ms + '/' + serialnr + '/' + uuid, JSON.stringify(notification));
+        if (resp.notification.title && resp.notification.message) {
+          const notification = _reformat_notification(resp.notification);
+          const uuid = lox_mqtt_adaptor.get_globalstates_uuid_from_key('globalstates/notifications');
+          _publish_topic(mqtt_topic_ms + '/' + serialnr + '/' + uuid, JSON.stringify(notification));
+        } else {
+          app.logger.info("Messaging - Incomplete notification received. Check title and message of the notification message.");  
+        }
       } else {
         app.logger.debug("MQTT Adaptor - Publising notifications over MQTT has been disabled by the user settings");
       }
