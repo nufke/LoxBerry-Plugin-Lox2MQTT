@@ -44,10 +44,16 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
   function _push_message(obj) {
     Object.values(pmsRegistrations).forEach(item => {
       if (item.ids.find(id => id == serialnr)) {
-        pms.postMessage(obj, item, serialnr).then(statusOk => {
-          if (statusOk) app.logger.info("Messaging - Push notification send to AppID: " + item.appId);
-          else app.logger.info("Messaging - Push notification failed to send to AppID: " + item.appId);
-        })
+        pms.postMessage(obj, item, serialnr).then(resp => {
+          if (resp.code == 200) app.logger.info("Messaging - Push notification send to AppID: " + item.appId);
+          else {
+            app.logger.info("Messaging - Push notification failed to send to AppID: " + item.appId + " response: " + resp.status + ': ' + resp.message);
+            delete pmsRegistrations[item.appId];
+            app.logger.info("Messaging - AppID " + item.appId + " removed from registry.");
+            cache.setKey('pmsRegistrations', pmsRegistrations);
+            cache.save();
+          }
+        });
       }
     });
   }
@@ -217,9 +223,15 @@ var MsClient = function(app, config, globalConfig, loxbuddyConfig, msid, mqtt_cl
         }
         values.forEach( item => {
           if (item.ids.find( id => id === serialnr)) {
-            pms.postMessage(resp.pushMessage, item, serialnr).then( statusOk => { 
-              if (statusOk) app.logger.info("Messaging - Push message send to AppID: " + item.appId);
-              else app.logger.info("Messaging - Push message failed to send to AppID: " + item.appId);
+            pms.postMessage(resp.pushMessage, item, serialnr).then(resp => { 
+              if (resp.code == 200) app.logger.info("Messaging - Push message send to AppID: " + item.appId);
+              else {
+                app.logger.info("Messaging - Push message failed to send to AppID: " + item.appId + " response: " + resp.status + ': ' + resp.message);
+                delete pmsRegistrations[item.appId];
+                app.logger.info("Messaging - AppID " + item.appId + " removed from registry.");
+                cache.setKey('pmsRegistrations', pmsRegistrations);
+                cache.save();
+              }
             });
           }
         });

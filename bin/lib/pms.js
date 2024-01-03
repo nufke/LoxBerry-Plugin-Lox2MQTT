@@ -68,7 +68,7 @@ pms.prototype.postMessage = function(obj, target, serialnr) {
     body:  JSON.stringify(body)
   })  
   .then(response => response.json()) // return any response type
-  .then(data => { this.app.logger.debug("Messaging - Response received: " + JSON.stringify(data)); return data.status == 'success'; })
+  .then(data => { this.app.logger.debug("Messaging - Response received: " + JSON.stringify(data)); return data; })
   .catch(error => {
     this.app.logger.error("Messaging - Server error: " + JSON.stringify(error));
   });
