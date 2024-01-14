@@ -8,8 +8,8 @@
   },
   "scripts": {
     "dev": "node lox2mqtt.js",
-    "start": "PM2_HOME=$(pwd)/.pm2 pm2 start lox2mqtt.config.js --watch",
-    "restart": "PM2_HOME=$(pwd)/.pm2 pm2 restart lox2mqtt.config.js --watch",
+    "start": "PM2_HOME=$(pwd)/.pm2 pm2 start lox2mqtt.config.js --watch --name Lox2MQTT",
+    "restart": "PM2_HOME=$(pwd)/.pm2 pm2 restart lox2mqtt.config.js --watch --name Lox2MQTT",
     "stop": "PM2_HOME=$(pwd)/.pm2 pm2 stop lox2mqtt.config.js",
     "delete": "PM2_HOME=$(pwd)/.pm2 pm2 delete lox2mqtt.config.js",
     "kill": "PM2_HOME=$(pwd)/.pm2 pm2 kill",

@@ -3,7 +3,8 @@
 ## v0.6.4 (BETA)
 
  * fix: proper reinit of adapter when receiving new structure file
- * save/restore push messaging information of registered apps
+ * fix: show message at plugin page if no miniservers are found
+ * push messaging capabilties moved to LoxBuddy plugin
 
 ## v0.6.3 (BETA)
 
