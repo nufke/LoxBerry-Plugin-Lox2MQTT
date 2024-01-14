@@ -8,7 +8,6 @@ const directories = () => {
     system_data: '/opt/loxberry/data/system',
     system_config: '/opt/loxberry/config/system',
     syslogdir: '/opt/loxberry/log/system_tmpfs',
-    loxbuddy_config: '/opt/loxberry/config/plugins/loxbuddy',
   };
 };
 

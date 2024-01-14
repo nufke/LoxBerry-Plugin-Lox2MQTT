@@ -33,8 +33,6 @@
   },
   "homepage": "https://github.com/nufke/LoxBerry-Plugin-Lox2MQTT/",
   "dependencies": {
-    "flat-cache": "^4.0.0",
-    "lodash": "4.17.21",
     "loxberry-logger": "git+https://github.com/nufke/loxberry-logger.git#9d1a7f0",
     "mqtt": "^4.3.7",
     "node-lox-ws-api": "git+https://github.com/codm/node-lox-ws-api#0.4.5-bugfix4",
