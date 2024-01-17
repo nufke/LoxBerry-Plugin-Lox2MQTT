@@ -4,7 +4,7 @@
 
  * fix: proper reinit of adapter when receiving new structure file
  * fix: show message at plugin page if no miniservers are found
- * push messaging capabilties moved to LoxBuddy plugin
+ * push messaging capabilities moved to LoxBuddy plugin
 
 ## v0.6.3 (BETA)
 

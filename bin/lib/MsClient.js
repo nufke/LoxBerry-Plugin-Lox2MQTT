@@ -25,34 +25,9 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
     mqtt_topic_ms = 'loxone';
   }
 
-  function _generate_lox_UUID() {
-    return 'xxxxxxxx-xxxx-6xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
-        return v.toString(16);
-    });
-  }
-  
-  function _reformat_notification(obj) {
-    const mac = obj.mac ? obj.mac : (obj.data && obj.data.mac ? obj.data.mac : serialnr);
-    const lvl = obj.lvl ? String(obj.lvl) : ( obj.data && obj.data.lvl ? String(obj.data.lvl) : '0');
-    const uuid = obj.uuid ? obj.uuid : ( obj.data && obj.data.uuid ? obj.data.uuid : '');
-    return {
-      uid: obj.uid ? obj.uid : _generate_lox_UUID(),                 // unique message id, generated if not specified
-      ts: obj.ts ? String(obj.ts) : String(Date.now()).slice(0, -3), // unix time stamp in seconds, generated if not specified
-      title: obj.title ? obj.title : 'no title',                     // message title or 'no title' if not specified
-      message: obj.message ? obj.message : 'no message body',        // message body or 'no message body' if not specified
-      type: obj.type ? String(obj.type) : '10',                      // message type or 10 (= normal message) if not specified
-      mac: mac,                                                      // mac of targeted miniserver
-      lvl: lvl,                                                      // level, 1 = Info, 2 = Error, 3 = SystemError, 0 = unknown
-      uuid: uuid                                                     // uuid of control, or empty string if not specified 
-    }
-  }
-
   function _update_event(uuid, value) {
     if (lox_mqtt_adaptor) {
-      const isNotification = lox_mqtt_adaptor.is_notification(uuid);
-      const data = isNotification ? JSON.stringify(_reformat_notification(JSON.parse(value))) : value;
-      lox_mqtt_adaptor.set_value_for_uuid(uuid, data);
+      lox_mqtt_adaptor.set_value_for_uuid(uuid, value);
     }
   }
 
@@ -106,7 +81,7 @@ var MsClient = function(app, config, globalConfig, msid, mqtt_client) {
     }
   });
 
-  mqtt_client.on('message', async function(topic, message, packet) {
+  mqtt_client.on('message', function(topic, message, packet) {
     // only send to Miniserver if adapter exists and the serial number in the topic matches
     if (lox_mqtt_adaptor && message.length && (topic.search(mqtt_topic_ms + "/" + serialnr) > -1)) {
       let action = lox_mqtt_adaptor.get_command_from_topic(topic, message.toString());

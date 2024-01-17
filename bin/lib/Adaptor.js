@@ -62,11 +62,9 @@ Adaptor.prototype.get_topics_for_subscription = function() {
   // subscribe to following topics:
   // <mqtt_topic_ms>/<serialnr>/<uuid>/cmd
   // <mqtt_topic_ms>/<serialnr>/<uuid>/<subcontrol>/cmd
-  // loxbuddy/cmd (used for PMS configuration, push messages and notifications)
   return [
     this.mqtt_topic_ms + '/+/+/cmd',
-    this.mqtt_topic_ms + '/+/+/+/cmd',
-    'loxbuddy/cmd'
+    this.mqtt_topic_ms + '/+/+/+/cmd'
   ]
 };
 
