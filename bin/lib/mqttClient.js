@@ -1,10 +1,10 @@
 const mqtt = require('mqtt');
 
-var mqtt_builder = function(globalConfig, app) {
-  var url = 'mqtt://' + globalConfig.Mqtt.Brokerhost + ':' + globalConfig.Mqtt.Brokerport;
-  var options = { username: globalConfig.Mqtt.Brokeruser, password: globalConfig.Mqtt.Brokerpass };
-  var client = mqtt.connect(url, options);
-  var errorCnt = 0;
+const mqttClient = function(globalConfig, app) {
+  const url = 'mqtt://' + globalConfig.Mqtt.Brokerhost + ':' + globalConfig.Mqtt.Brokerport;
+  const options = { username: globalConfig.Mqtt.Brokeruser, password: globalConfig.Mqtt.Brokerpass };
+  const client = mqtt.connect(url, options);
+  let errorCnt = 0;
 
   app.on('exit', function(code) {
     client.end();
@@ -12,7 +12,7 @@ var mqtt_builder = function(globalConfig, app) {
 
   client.on('connect', function(connack) {
     app.logger.info("MQTT Client - connect: " + JSON.stringify(connack));
-    errorCnt=0;
+    errorCnt = 0;
   });
 
   client.on('reconnect', function() {
@@ -20,7 +20,7 @@ var mqtt_builder = function(globalConfig, app) {
   });
 
   client.on('close', function() {
-    if (errorCnt==0) {
+    if (errorCnt == 0) {
       app.logger.info("MQTT Client - close");
     }
   });
@@ -30,10 +30,10 @@ var mqtt_builder = function(globalConfig, app) {
   });
 
   client.on('error', function(error) {
-    if (errorCnt==0) {
+    if (errorCnt == 0) {
       app.logger.error("MQTT Client - error: " + error);
     }
-    if (errorCnt==101) {
+    if (errorCnt == 101) {
       app.logger.error("MQTT Client - more than 100 errors received. Check your connection to the MQTT server");
     }
     errorCnt++;
@@ -46,4 +46,4 @@ var mqtt_builder = function(globalConfig, app) {
   return client;
 };
 
-module.exports = mqtt_builder;
+module.exports = mqttClient;

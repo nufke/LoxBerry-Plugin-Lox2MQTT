@@ -4,8 +4,8 @@ const fs = require('fs');
 const directories = require('./lib/directories');
 const configFile = `${directories.config}/default.json`;
 const globalConfigFile = `${directories.homedir}/config/system/general.json`;
+const globalConfig = require(globalConfigFile);
 
-let globalConfig = require(globalConfigFile);
 let config;
 
 try {
@@ -19,9 +19,9 @@ try {
   console.log(err);
 }
 
-update_config(config);
+updateConfig(config);
 
-function update_config(config) {
+function updateConfig(config) {
 
   if (!config)
     config = {};

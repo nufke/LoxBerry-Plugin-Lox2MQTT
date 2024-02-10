@@ -1,5 +1,11 @@
 # Version History
 
+## v0.7.0 (BETA)
+
+ * publish securedDetails over MQTT (e.g. Intercom A/V settings)
+ * fix: only relay notification message (no push messages)
+ * fix PM2 process management
+
 ## v0.6.4 (BETA)
 
  * fix: proper reinit of adapter when receiving new structure file
@@ -13,13 +19,13 @@
 
 ## v0.6.2 (BETA)
 
- * fix: generate Loxone-specific UUID 
+ * fix: generate Loxone-specific UUID
  * fix: remove dependency of crypto library
  * fix: formatting of notifications
 
 ## v0.6.1 (BETA)
 
- * fix: incoming MQTT control commands were not relayed to miniserver(s) 
+ * fix: incoming MQTT control commands were not relayed to miniserver(s)
  * align notification and push messages API using MQTT
 
 ## v0.6.0 (BETA)

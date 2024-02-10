@@ -32,7 +32,7 @@
                   :class="{ 'ui-checkbox-on': ms.enabled==true, 'ui-checkbox-off': ms.enabled==false }"
                   :for=`enabled-${index}`>Enable Miniserver in MQTT communication</label>
                 <input type="checkbox" :id=`enabled-${index}` v-model="ms.enabled"
-                  v-on:change="formadata_changed();">
+                  v-on:change="formDataChanged();">
               </div>
               <p class="hint"><b>NOTE:</b> Miniserver(s) configured as Client can be controlled via a Gateway Miniserver and do not need to be enabled explicitly.</p>
             </div>
@@ -42,7 +42,7 @@
           <label for="ms.mqtt_topic_ms" class="col-fixed" style="min-width:15%">Miniserver topic name</label>
           <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
             <input type="text" style="width:50%" id="ms.mqtt_topic_ms" v-model.trim="ms.mqtt_topic_ms"
-              v-on:change="formadata_changed()">
+              v-on:change="formDataChanged()">
           </div>
         </div>
         <div v-if="ms.enabled" class="ui-field-contain">
@@ -56,35 +56,35 @@
                   :class="{ 'ui-checkbox-on': ms.other_user==true, 'ui-checkbox-off': ms.other_user==false }"
                   :for=`other_user-${index}`>Use other Miniserver login credentials</label>
                 <input type="checkbox" :id=`other_user-${index}` v-model="ms.other_user"
-                  v-on:change="formadata_changed();">
+                  v-on:change="formDataChanged();">
               </div>
               <div class="ui-checkbox">
                 <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left"
                   :class="{ 'ui-checkbox-on': ms.publish_structure==true, 'ui-checkbox-off': ms.publish_structure==false }"
                   :for=`publish_structure-${index}`>Publish structure</label>
                 <input type="checkbox" :id=`publish_structure-${index}` v-model="ms.publish_structure"
-                  v-on:change="formadata_changed();">
+                  v-on:change="formDataChanged();">
               </div>
               <div class="ui-checkbox">
                 <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left"
                   :class="{ 'ui-checkbox-on': ms.publish_states==true, 'ui-checkbox-off': ms.publish_states==false }"
                   :for=`publish_states-${index}`>Publish control state changes</label>
                 <input type="checkbox" :id=`publish_states-${index}` v-model="ms.publish_states"
-                  v-on:change="formadata_changed();">
+                  v-on:change="formDataChanged();">
               </div>
               <div class="ui-checkbox">
                 <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left"
                   :class="{ 'ui-checkbox-on': ms.retain_message==true, 'ui-checkbox-off': ms.retain_message==false }"
                   :for=`retain_message-${index}`>Retain published MQTT messages</label>
                 <input type="checkbox" :id=`retain_message-${index}` v-model="ms.retain_message"
-                  v-on:change="formadata_changed();">
+                  v-on:change="formDataChanged();">
               </div>
               <div class="ui-checkbox">
                 <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-last-child"
                   :class="{ 'ui-checkbox-on': ms.subscribe==true, 'ui-checkbox-off': ms.subscribe==false }"
                   :for=`subscribe-${index}`>Subscribe to MQTT to control the Miniserver</label>
                 <input type="checkbox" :id=`subscribe-${index}` v-model="ms.subscribe"
-                  v-on:change="formadata_changed();">
+                  v-on:change="formDataChanged();">
               </div>
               <p class="hint"><b>WARNING!</b> Publishing and subscribing to control state changes will increase the
                 load on your Loxone Miniserver and MQTT server.</p>
@@ -96,19 +96,19 @@
             <label :for=`user-${index}` class="col-fixed" style="min-width:15%">Miniserver username</label>
             <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
               <input type="text" required style="width:50%" :id=`user-${index}` v-model.trim="ms.user"
-                v-on:change="formadata_changed()">
+                v-on:change="formDataChanged()">
             </div>
           </div>
           <div class="ui-field-contain">
             <label :for=`pass-${index}` class="col-fixed" style="min-width:15%">Miniserver password</label>
             <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset">
               <input type="password" required style="width:50%" :id=`pass-${index}` v-model.trim="ms.pass"
-                v-on:change="formadata_changed()">
+                v-on:change="formDataChanged()">
             </div>
           </div>
         </div> <!-- v-if ms.other_user -->
       </div> <!-- v-for -->
-      
+
       <!-- Save and Apply button -->
       <div style="display:flex;align-items:center;justify-content:center;">
         <button :disabled='btn_disabled' class="ui-btn ui-btn-icon-right" data-inline="true"
@@ -170,11 +170,10 @@
       };
     },
     methods: {
-      formadata_changed() {
+      formDataChanged() {
         this.data_changed = true;
         this.data_saved = false;
       },
-
       saveApply() {
         console.log("Called Save and Apply");
         const requestOptions = {
@@ -182,7 +181,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(this.$data.config)
         };
-        var self = this;
+        let self = this;
         // Update default.json of the plugin
         fetch(generic + '?file=LBPCONFIG/lox2mqtt/default.json&write', requestOptions)
           .then(function (response) {
@@ -198,7 +197,6 @@
             }
           });
       },
-
       getPluginConfig() {
         console.log("Called getPluginConfig");
         fetch(generic + '?file=LBPCONFIG/lox2mqtt/default.json&read')
@@ -212,7 +210,6 @@
             this.config = data;
           });
       },
-
       getSysConfig() {
         console.log("Called getSysConfig");
         fetch(generic + '?file=LBSCONFIG/general.json&read&section=Miniserver')
@@ -229,7 +226,6 @@
             });
           })
       },
-
       updatePid() {
         console.log("Called updatePid");
         fetch('/admin/plugins/lox2mqtt/ajax/ajax-lox2mqtt-handler.php?ajax=get_lox2mqtt_pid')

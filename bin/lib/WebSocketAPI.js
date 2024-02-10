@@ -1,23 +1,23 @@
 const node_lox_ws_api = require("node-lox-ws-api");
 
-function _limit_string(text, limit) {
-  if (text.length <= limit) {
-    return text;
-  }
-  return text.substr(0, limit) + '...(' + text.length + ')';
-}
-
-var WebSocketAPI = function(app, config, globalConfig, msid) {
-  var miniserver = globalConfig.Miniserver[msid];
+const WebSocketAPI = function(app, config, globalConfig, msid) {
+  const miniserver = globalConfig.Miniserver[msid];
   // FIXME: currently only support for http port for communication with Miniserver(s)
-  // var host = miniserver.Ipaddress + ":" + ((miniserver.Preferhttps==='1') ? miniserver.Porthttps : miniserver.Port);
-  var host = miniserver.Ipaddress + ":" + miniserver.Port;
+  // const host = miniserver.Ipaddress + ":" + ((miniserver.Preferhttps==='1') ? miniserver.Porthttps : miniserver.Port);
+  const host = miniserver.Ipaddress + ":" + miniserver.Port;
   const user = config.miniserver[msid].other_user ? config.miniserver[msid].user : miniserver.Admin_raw;
   const pass = config.miniserver[msid].other_user ? config.miniserver[msid].pass : miniserver.Pass_raw;
 
+  function limitString(text, limit) {
+    if (text.length <= limit) {
+      return text;
+    }
+    return text.substr(0, limit) + '...(' + text.length + ')';
+  }
+
   app.logger.info("WebSocketAPI " + host + " - try to connect to Miniserver as user " + user + "...");
-  var client = new node_lox_ws_api(host, user, pass, true, 'Token-Enc');
-  var text_logger_limit = 100;
+  const client = new node_lox_ws_api(host, user, pass, true, 'Token-Enc');
+  const LogLimit = 100; // TODO configuration item
 
   app.on('exit', function(code) {
     client.abort();
@@ -48,12 +48,12 @@ var WebSocketAPI = function(app, config, globalConfig, msid) {
   });
 
   client.on('message_text', function(message) {
-    var data = {
+    let data = {
       type: message.type,
     };
     switch (message.type) {
       case 'json':
-        data.json = _limit_string(JSON.stringify(message.json), text_logger_limit);
+        data.json = limitString(JSON.stringify(message.json), LogLimit);
         break;
       case 'control':
         data.control = message.control;
@@ -61,41 +61,41 @@ var WebSocketAPI = function(app, config, globalConfig, msid) {
         data.code = message.code;
         break;
       default:
-        data.text = _limit_string(message.data, text_logger_limit);
+        data.text = limitString(message.data, LogLimit);
     }
     app.logger.debug("WebSocketAPI " + host + " - received text message: " + JSON.stringify(data));
   });
 
   client.on('message_file', function(message) {
-    var data = {
+    let data = {
       type: message.type,
       filename: message.filename,
     };
     switch (message.type) {
       case 'json':
-        data.json = _limit_string(JSON.stringify(message.data), text_logger_limit);
+        data.json = limitString(JSON.stringify(message.data), LogLimit);
         break;
       case 'binary':
         data.length = message.data, length;
         break;
       default:
-        data.text = _limit_string(message.data, text_logger_limit);
+        data.text = limitString(message.data, LogLimit);
     }
     app.logger.debug("WebSocketAPI " + host + " - received file: " + JSON.stringify(data));
   });
 
-  function _update_event(uuid, evt) {
-    var data = {
+  function updateEvent(uuid, evt) {
+    const data = {
       uuid: uuid,
-      'event': _limit_string(JSON.stringify(evt), text_logger_limit),
+      'event': limitString(JSON.stringify(evt), LogLimit),
     };
     app.logger.debug("WebSocketAPI " + host + " - received update event: " + JSON.stringify(data));
   }
 
-  client.on('update_event_value', _update_event);
-  client.on('update_event_text', _update_event);
-  client.on('update_event_daytimer', _update_event);
-  client.on('update_event_weather', _update_event);
+  client.on('update_event_value', updateEvent);
+  client.on('update_event_text', updateEvent);
+  client.on('update_event_daytimer', updateEvent);
+  client.on('update_event_weather', updateEvent);
 
   client.on('message_invalid', function(message) {
     app.logger.warn("WebSocketAPI " + host + " - invalid message: " + JSON.stringify(message));
