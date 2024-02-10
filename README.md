@@ -41,10 +41,10 @@ When saving the configuration, the Lox2MQTT plugin will be restarted automatical
 Each Miniserver state change is broadcasted over MQTT, using the following topic structure:
 
 ```
-<mqtt_topic_ms>/<serialnr>/<uuid> <value>
+<mqttTopic>/<serialnr>/<uuid> <value>
 ```
 
-Each MQTT message uses a topic name `<mqtt_topic_ms>` as is defined in the configuration, to identify messages send to or from a Loxone Miniserver. The next topic level specifies the serial number `serialnr` of the Miniserver, followed by a unique identifier `uuid` representing a control state, which can be found in the Loxone structure file `LoxAPP3.json` on your Miniserver.
+Each MQTT message uses a topic name `<mqttTopic>` as is defined in the configuration, to identify messages send to or from a Loxone Miniserver. The next topic level specifies the serial number `serialnr` of the Miniserver, followed by a unique identifier `uuid` representing a control state, which can be found in the Loxone structure file `LoxAPP3.json` on your Miniserver.
 
 If enabled, each last Miniserver control state broadcast is retained by the MQTT server. This enables MQTT clients to receive the latest state values immediately after subscribing to the topic.
 
@@ -61,7 +61,7 @@ Where `loxone` is the MQTT topic indicating a Miniserver message, `0123456789AB`
 Broadcasting the Miniserver structure might be relevant for MQTT subscribers such as mobile apps to receive information on the available controls, their properties, capabilties and states. If enabled, the Miniserver structure (`LoxAPP3.json`) is broadcasted over MQTT, but only once, at plugin startup. It uses the following topic structure:
 
 ```
-<mqtt_topic_ms>/<serialnr>/structure <LoxAPP3.json>
+<mqttTopic>/<serialnr>/structure <LoxAPP3.json>
 ```
 
 If enabled, the Miniserver structure is retained by the MQTT server. This enables MQTT clients to receive the latest structure immediately after subscribing to the topic.
@@ -71,11 +71,11 @@ If enabled, the Miniserver structure is retained by the MQTT server. This enable
 To control a Loxone Miniserver, a message should be send using the following topic structure:
 
 ```
-<mqtt_topic_ms>/<serialnr>/<uuid>/cmd <command>
+<mqttTopic>/<serialnr>/<uuid>/cmd <command>
 ```
 or
 ```
-<mqtt_topic_ms>/<serialnr>/<uuid>/<subcontrol>/cmd <command>
+<mqttTopic>/<serialnr>/<uuid>/<subcontrol>/cmd <command>
 ```
 
 Note that Loxone subcontrols share the same `uuid` inherited from the parent control, and therefore define an additional string `subcontrol`. The name for the `subcontrol` can be found in the Loxone Miniserver structure file `LoxAPP3.json` listed under the `uuid` of the parent control.
@@ -96,22 +96,25 @@ A: The LoxBerry MQTT Widget communicates to the Miniserver via HTTP Virtual Inpu
 
 **Q: I receive state information from my Miniserver over MQTT, but I do not recognize the format and identifiers**
 
-A: A received MQTT message has the following format: `<mqtt_topic_ms>/<serialnr>/<uuid> <value>`. Each MQTT message uses the Miniserver topic name (`mqtt_topic_ms`) as defined in the plugin configuration to identify messages coming from a Loxone Miniserver. The next topic level specifies the serial number (`serialnr`) of your Miniserver, followed by the unique identifier (`uuid`) representing a control state as defined in the Loxone structure file `LoxAPP3.json` on your Miniserver.
+A: A received MQTT message has the following format: `<mqttTopic>/<serialnr>/<uuid> <value>`. Each MQTT message uses the Miniserver topic name (`mqttTopic`) as defined in the plugin configuration to identify messages coming from a Loxone Miniserver. The next topic level specifies the serial number (`serialnr`) of your Miniserver, followed by the unique identifier (`uuid`) representing a control state as defined in the Loxone structure file `LoxAPP3.json` on your Miniserver.
 
 **Q: Can I change the Miniserver control states via MQTT?**
 
-A: Yes, you can send MQTT messages which are converted to commands for the Loxone Miniserver. A transmited MQTT message should have the following format: `<mqtt_topic_ms>/<serialnr>/<uuid>/cmd <command>`. Note the command extension (`/cmd`) in this message, which has been added to the unique identifier of a control or subcontrol. The allowed values for `command` are defined in the [Loxone Structure File](https://www.loxone.com/wp-content/uploads/datasheets/StructureFile.pdf).
+A: Yes, you can send MQTT messages which are converted to commands for the Loxone Miniserver. A transmited MQTT message should have the following format: `<mqttTopic>/<serialnr>/<uuid>/cmd <command>`. Note the command extension (`/cmd`) in this message, which has been added to the unique identifier of a control or subcontrol. The allowed values for `command` are defined in the [Loxone Structure File](https://www.loxone.com/wp-content/uploads/datasheets/StructureFile.pdf).
 
 **Q: Where can I find my Loxone Miniserver structure file `LoxAPP3.json`?**
 
-A: You can download your structure file via URL `http://<miniserver_ip_address>/data/LoxAPP3.json` or access it via FTP in directory `web/data/LoxAPP3.json`. In both cases, login credentials are required.
-
-## Issues and questions
-
-Please submit your issues and questions via the GitHub issue tracker: https://github.com/nufke/LoxBerry-Plugin-Lox2MQTT/issues or use https://www.loxforum.com
+A: You can download your structure file via URL `http://<miniserverIPAddress>/data/LoxAPP3.json` or access it via FTP in directory `web/data/LoxAPP3.json`. In both cases, login credentials are required.
 
 ## Credits
 
 This plugin uses portions of the [Node.js Loxone WebSocket API](https://github.com/alladdin/node-lox-ws-api) created by [Ladislav Dokulil](https://github.com/alladdin)
 
 The logging capabilites are based on the [LoxBerry message-center plugin](https://github.com/LoxYourLife/message-center) developed by [LoxYourLife](https://github.com/LoxYourLife)
+
+## Issues and questions
+
+Please submit your issues and questions via the GitHub issue tracker: https://github.com/nufke/LoxBerry-Plugin-Lox2MQTT/issues or use https://www.loxforum.com
+
+
+<a href="https://www.buymeacoffee.com/nufke" target="_blank"><img src="./icons/svg/bmc.svg" alt="Buy Me A Coffee"></a>
