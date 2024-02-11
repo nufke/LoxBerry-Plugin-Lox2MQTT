@@ -1,5 +1,9 @@
 # Version History
 
+## v0.7.1 (BETA)
+
+ * fix: use topic from configuration
+
 ## v0.7.0 (BETA)
 
  * publish securedDetails over MQTT (e.g. Intercom A/V settings)

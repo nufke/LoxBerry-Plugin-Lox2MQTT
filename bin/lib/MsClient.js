@@ -21,7 +21,7 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
   // check configuration variables
   let retainMessage = config.miniserver[msid].retain_message | false;
 
-  let mqttTopic = config.miniserver[msid].mqttTopic;
+  let mqttTopic = config.miniserver[msid].mqtt_topic_ms;
   if (mqttTopic === undefined || !mqttTopic.length) {
     mqttTopic = 'loxone';
   }
