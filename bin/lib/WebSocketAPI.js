@@ -18,7 +18,7 @@ const WebSocketAPI = function(app, config, globalConfig, msid) {
   app.logger.info("WebSocketAPI " + host + " - try to connect to Miniserver as user " + user + "...");
   const client = new node_lox_ws_api(host, user, pass, true, 'Token-Enc');
   const LogLimit = 100; // TODO configuration item
-
+ 
   app.on('exit', function(code) {
     client.abort();
   });

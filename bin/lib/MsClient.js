@@ -36,8 +36,12 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
     let payload = String(data);
     let options = { retain: retainMessage, qos: 1 };
     let fixedTopicName = topic.replace("+", "_").replace("#", "_")
-    app.logger.debug("MQTT Adaptor - Publish topic: " + topic + ", payload: " + payload);
-    mqttClient.publish(fixedTopicName, payload, options);
+    app.logger.debug("MQTT Client - Publish topic: " + topic + ", payload: " + payload);
+    try {
+      mqttClient.publish(fixedTopicName, payload, options);
+    } catch (error) {
+      app.logger.error("MQTT Client - Error in publishing MQTT message. Error: " + error);
+    }
   }
 
   function publishSecuredDetails() {
@@ -66,6 +70,34 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
     });
   }
 
+  function publishHistory() {
+    let ms = globalConfig.Miniserver[msid];
+    let details = msAdapter.getHistory();
+    details.forEach( uuid => {
+      fetch("http://" + ms.Ipaddress + ":" + ms.Port + "/jdev/sps/io/" + uuid + "/gethistory",
+      { method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Basic " + base64.encode(ms.Admin +  ":" + ms.Pass)
+        }
+      }).then( response => {
+        if (response.status !== 200) {
+          app.logger.error('Fetch error. Status code: ' + response.status);
+          return;
+        }
+        response.json().then( data => {
+          console.log('history:', JSON.stringify(data));
+          if (!data) return;  // no or empty data
+          let topic = mqttTopic + '/' + msSerialNr + '/' + uuid + '/history';
+          publishTopic(topic, JSON.stringify(data));
+        });
+      }).catch( error => {
+        app.logger.error('Fetch error : ', error);
+      });
+    });
+  }
+
+  
   msWebsocket.on('update_event_text', updateEvent);
   msWebsocket.on('update_event_value', updateEvent);
   msWebsocket.on('update_event_daytimer', updateEvent);
@@ -95,12 +127,14 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
       if (config.miniserver[msid].publish_structure) {
         publishTopic(topic, data);
         publishSecuredDetails();
+        publishHistory();
       } else {
         app.logger.debug("MQTT Adaptor - Publishing the structure has been disabled by the user settings");
       }
     });
 
     msAdapter.publishStructure();
+    msAdapter.publishStates();
   });
 
   mqttClient.on('connect', function(conack) {
@@ -112,13 +146,26 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
   mqttClient.on('message', function(topic, message, packet) {
     // only send to Miniserver if adapter exists and the serial number in the topic matches
     if (msAdapter && message.length && (topic.search(mqttTopic + "/" + msSerialNr) > -1)) {
-      let action = msAdapter.getCommandFromTopic(topic, message.toString());
-      app.logger.debug("MQTT Adaptor - for miniserver, uuidAction: " + action.uuidAction + ", command: ", + action.command);
+      let control = msAdapter.getControlFromTopic(topic, message.toString());
+      if (control) {
+        app.logger.debug("MQTT Adaptor - for Miniserver, uuidAction: " + control.uuidAction + ", command: ", + control.command);
+      } else {
+        app.logger.error("MQTT Adaptor - topic received for Miniserver, but no associated control.");
+        return;
+      }
       if (config.miniserver[msid].subscribe) {
-        msWebsocket.send_cmd(action.uuidAction, action.command);
+        try {
+          msWebsocket.send_cmd(control.uuidAction, control.command);
+        } catch(error) {
+          app.logger.error("WebSocketAPI - Error in sending command. Error: " + error);
+        }
       } else {
         app.logger.debug("MQTT Adaptor - Miniserver in readonly mode");
       }
+    }
+    // trigger to publish states
+    if (msAdapter && message.length && (topic.search(mqttTopic + "/" + msSerialNr + "/states/cmd") > -1)) {
+      msAdapter.publishStates();
     }
   });
 

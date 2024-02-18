@@ -11,12 +11,12 @@ let config;
 try {
   const configData = fs.readFileSync(configFile);
   config = JSON.parse(configData);
-} catch (err) {
+} catch (error) {
   // in case of an error, the config file is not found
   // or the content is not compliant to JSON format.
   // print, the error, but proceed with the creation of the
   // config file, since it is considered empty
-  console.log(err);
+  console.log(error);
 }
 
 updateConfig(config);

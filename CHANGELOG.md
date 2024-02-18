@@ -1,5 +1,11 @@
 # Version History
 
+## v0.8.0 (BETA)
+
+ * add exception handling when MQTT server or websocket are not accessible 
+ * publish latest control states when requested over MQTT
+ * publish control history (available since structure file version 14.4)
+
 ## v0.7.1 (BETA)
 
  * fix: use topic from configuration

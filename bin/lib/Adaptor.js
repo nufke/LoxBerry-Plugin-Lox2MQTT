@@ -8,6 +8,7 @@ const Adaptor = function(structure, mqttTopic) {
   this.path2control = {};
   this.controlList = [];
   this.stateuuid2path = {};
+  this.states = {};
   this.buildPaths();
 };
 
@@ -18,22 +19,28 @@ Adaptor.prototype.clear = function() {
 };
 
 Adaptor.prototype.setValueForUuid = function(uuid, value) {
-  this.emit('publish_state', this.mqttTopic + '/' + this.msSerialNr + '/' + uuid, value);
+  let topic = this.mqttTopic + '/' + this.msSerialNr + '/' + uuid;
+  this.states[topic] = String(value);
+  this.emit('publish_state', topic, value);
+};
+
+Adaptor.prototype.publishStates = function() {
+  this.emit('publish_state', this.mqttTopic + '/' + this.msSerialNr + '/states', JSON.stringify(this.states));
 };
 
 Adaptor.prototype.getSerialnr = function() {
   return this.msSerialNr;
 };
 
-Adaptor.prototype.control_exists = function(uuid) {
-  return (this.controlList.findIndex( item => item == uuid) > -1);
-};
-
 Adaptor.prototype.getSecuredDetails = function() {
   return Object.values(this.structure.controls).filter( item => item.securedDetails == true).map(item => item.uuidAction);
 }
 
-Adaptor.prototype.getCommandFromTopic = function(topic, data) {
+Adaptor.prototype.getHistory = function() {
+  return Object.values(this.structure.controls).filter( item => item.details && item.details.hasHistory > 0).map(item => item.uuidAction);
+}
+
+Adaptor.prototype.getControlFromTopic = function(topic, data) {
   const path_groups = topic.match('^(.+)/cmd$');
   if (!path_groups) {
     return {};
@@ -51,6 +58,7 @@ Adaptor.prototype.getCommandFromTopic = function(topic, data) {
 Adaptor.prototype.getTopics = function() {
   // subscribe to following topics:
   // <mqttTopic>/<serialnr>/<uuid>/cmd
+  // <mqttTopic>/<serialnr>/states/cmd
   // <mqttTopic>/<serialnr>/<uuid>/<subcontrol>/cmd
   return [
     this.mqttTopic + '/+/+/cmd',
