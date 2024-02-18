@@ -61,6 +61,7 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
         }
         response.json().then( data => {
           if (!data.LL.value) return;  // unexpected payload, do not publish
+          app.logger.debug('Publish securedDetails for control ' + uuid + ':' + data.LL.value);
           let topic = mqttTopic + '/' + msSerialNr + '/' + uuid + '/securedDetails';
           publishTopic(topic, data.LL.value);
         });
@@ -86,10 +87,11 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
           return;
         }
         response.json().then( data => {
-          console.log('history:', JSON.stringify(data));
-          if (!data) return;  // no or empty data
+          if (!data) return;  // no data available, do not publish
+          let payload = JSON.stringify(data);
+          app.logger.debug('Publish history for control ' + uuid + ':' + payload);
           let topic = mqttTopic + '/' + msSerialNr + '/' + uuid + '/history';
-          publishTopic(topic, JSON.stringify(data));
+          publishTopic(topic, payload);
         });
       }).catch( error => {
         app.logger.error('Fetch error : ', error);
