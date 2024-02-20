@@ -26,4 +26,10 @@ npm --prefix $PBIN run kill
 echo "<INFO> Uninstall local Node.js packages..."
 npm --prefix $PBIN uninstall lox2mqtt
 
+echo "<INFO> Remove all plugin files..."
+rm -rf $PDATA
+rm -rf $PCONFIG
+rm -rf $PLOG
+rm -rf $PBIN
+
 exit 0;
