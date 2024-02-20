@@ -61,9 +61,10 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
         }
         response.json().then( data => {
           if (!data.LL.value) return;  // unexpected payload, do not publish
-          app.logger.debug('Publish securedDetails for control ' + uuid + ':' + data.LL.value);
+          let payload = data.LL.value;
+          app.logger.debug('Publish securedDetails for control ' + uuid + ':' + payload);
           let topic = mqttTopic + '/' + msSerialNr + '/' + uuid + '/securedDetails';
-          publishTopic(topic, data.LL.value);
+          publishTopic(topic, payload);
         });
       }).catch( error => {
         app.logger.error('Fetch error : ', error);
