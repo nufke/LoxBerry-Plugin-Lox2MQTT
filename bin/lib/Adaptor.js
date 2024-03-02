@@ -28,7 +28,6 @@ Adaptor.prototype.setValueForUuid = function(uuid, value, publishTopicName) {
   } else {
     topic = this.mqttTopic + '/' + this.msSerialNr + '/' + uuid;
   }
-  console.log('publish_state', topic, value);
   this.states[topic] = String(value);
   this.emit('publish_state', topic, value);
 };
@@ -114,12 +113,10 @@ Adaptor.prototype.processStates = function(control, ctrlName) {
         state.forEach( (element, index) => {
           let namedTopic = ctrlName + '/' + key + '/' + index;
           this.uuid2topic[element] = namedTopic;
-          //console.log('uuid2topic array:', element, namedTopic);
         });
       } else {
         let namedTopic = ctrlName + '/' + key;
         this.uuid2topic[state] = namedTopic;
-        //console.log('uuid2topic:', state, namedTopic);
       }
     });
   }
