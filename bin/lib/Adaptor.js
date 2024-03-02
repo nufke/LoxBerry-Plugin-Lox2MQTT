@@ -8,6 +8,9 @@ const Adaptor = function(structure, mqttTopic) {
   this.path2control = {};
   this.controlList = [];
   this.stateuuid2path = {};
+  this.uuid2topic = {};
+  this.rooms = {};
+  this.cats = {};
   this.states = {};
   this.buildPaths();
 };
@@ -18,8 +21,14 @@ Adaptor.prototype.clear = function() {
   this.structure = undefined;
 };
 
-Adaptor.prototype.setValueForUuid = function(uuid, value) {
-  let topic = this.mqttTopic + '/' + this.msSerialNr + '/' + uuid;
+Adaptor.prototype.setValueForUuid = function(uuid, value, publishTopicName) {
+  let topic;
+  if (publishTopicName && this.uuid2topic[uuid]) {
+    topic = this.uuid2topic[uuid];
+  } else {
+    topic = this.mqttTopic + '/' + this.msSerialNr + '/' + uuid;
+  }
+  console.log('publish_state', topic, value);
   this.states[topic] = String(value);
   this.emit('publish_state', topic, value);
 };
@@ -71,26 +80,83 @@ Adaptor.prototype.publishStructure = function() { // NOTE: we publish the origin
 };
 
 Adaptor.prototype.buildPaths = function() {
-  Object.keys(this.structure.controls).forEach(function(key) {
-    const control = this.structure.controls[key];
+  let that = this;
+  Object.keys(this.structure.rooms).forEach( (key) => {
+    let room = that.structure.rooms[key];
+    that.rooms[key] = room.name;
+  });
+  Object.keys(this.structure.cats).forEach( (key) => {
+    let cat = that.structure.cats[key];
+    that.cats[key] = cat.name;
+  });
+  Object.keys(this.structure.controls).forEach( (key) => {
+    const control = that.structure.controls[key];
     this.addControl(control);
     if (control.subControls !== undefined) {
-      Object.keys(control.subControls).forEach(function(sub_key) {
-        this.addControl(control.subControls[sub_key]);
-      }, this);
+      Object.keys(control.subControls).forEach( (sub_key) => {
+        const subControl = control.subControls[sub_key];
+        this.addControl(control, subControl);
+      });
     }
-  }, this);
+  });
 
   this.path2control['globalstates'] = this.structure.globalStates;
   Object.keys(this.structure.globalStates).forEach(function(key) {
-    this.stateuuid2path[this.structure.globalStates[key]] = 'globalstates/' + key;
+    this.stateuuid2path[that.structure.globalStates[key]] = 'globalstates/' + key;
   }, this);
 };
 
-Adaptor.prototype.addControl = function(control) {
+Adaptor.prototype.processStates = function(control, ctrlName) {
+  if (control.states) {
+    Object.keys(control.states).forEach(key => {
+      let state = control.states[key];
+      if (Array.isArray(state)) { // check if array, then unroll array
+        state.forEach( (element, index) => {
+          let namedTopic = ctrlName + '/' + key + '/' + index;
+          this.uuid2topic[element] = namedTopic;
+          //console.log('uuid2topic array:', element, namedTopic);
+        });
+      } else {
+        let namedTopic = ctrlName + '/' + key;
+        this.uuid2topic[state] = namedTopic;
+        //console.log('uuid2topic:', state, namedTopic);
+      }
+    });
+  }
+}
+
+Adaptor.prototype.addControl = function(control, subcontrol = undefined) {
+ 
+  function slugify(str) {
+    return String(str)
+      .normalize('NFKD') // split accented characters into their base characters and diacritical marks
+      .replace(/[\u0300-\u036f]/g, '') // remove all the accents, which happen to be all in the \u03xx UNICODE block.
+      .trim() // trim leading or trailing whitespace
+      .toLowerCase() // convert to lowercase
+      .replace(/[^a-z0-9 -]/g, '') // remove non-alphanumeric characters
+      .replace(/\s+/g, '-') // replace spaces with hyphens
+      .replace(/-+/g, '-'); // remove consecutive hyphens
+  }
+  
   const path = this.mqttTopic + '/' + this.msSerialNr + '/' + control.uuidAction;
+  
+  let namedTopic = this.mqttTopic + '/' + this.msSerialNr + '/' +
+    slugify(this.cats[control.cat]) + '/' + slugify(this.rooms[control.room]) + '/' + slugify(control.name);
+
+  if (subcontrol) namedTopic += '/' + slugify(subcontrol.name);
+
   this.path2control[path] = control;
+  this.uuid2topic[control.uuidAction] = namedTopic;
   this.controlList.push(control.uuidAction);
+  
+  if (control && control.states) {
+    this.processStates(control, namedTopic);
+  }
+
+  if (subcontrol && subcontrol.states) {
+    this.processStates(subcontrol, namedTopic);
+  }
+
 };
 
 module.exports = Adaptor;

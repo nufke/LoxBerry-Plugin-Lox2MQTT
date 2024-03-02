@@ -19,8 +19,9 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
   }
 
   // check configuration variables
-  let retainMessage = config.miniserver[msid].retain_message | false;
-
+  const retainMessage = config.miniserver[msid].retain_message | false;
+  const publishTopicNames = config.miniserver[msid].publish_topic_names | false;
+  
   let mqttTopic = config.miniserver[msid].mqtt_topic_ms;
   if (mqttTopic === undefined || !mqttTopic.length) {
     mqttTopic = 'loxone';
@@ -28,7 +29,7 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
 
   function updateEvent(uuid, value) {
     if (msAdapter) {
-      msAdapter.setValueForUuid(uuid, value);
+      msAdapter.setValueForUuid(uuid, value, publishTopicNames);
     }
   }
 
@@ -100,7 +101,6 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
     });
   }
 
-  
   msWebsocket.on('update_event_text', updateEvent);
   msWebsocket.on('update_event_value', updateEvent);
   msWebsocket.on('update_event_daytimer', updateEvent);
