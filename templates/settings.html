@@ -74,6 +74,13 @@
               </div>
               <div class="ui-checkbox">
                 <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left"
+                  :class="{ 'ui-checkbox-on': ms.publish_topic_names==true, 'ui-checkbox-off': ms.publish_topic_names==false }"
+                  :for=`publish_topic_names-${index}`>Use control category and room as MQTT subtopic names</label>
+                <input type="checkbox" :id=`publish_topic_names-${index}` v-model="ms.publish_topic_names"
+                  v-on:change="formDataChanged();">
+              </div>
+              <div class="ui-checkbox">
+                <label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left"
                   :class="{ 'ui-checkbox-on': ms.retain_message==true, 'ui-checkbox-off': ms.retain_message==false }"
                   :for=`retain_message-${index}`>Retain published MQTT messages</label>
                 <input type="checkbox" :id=`retain_message-${index}` v-model="ms.retain_message"
