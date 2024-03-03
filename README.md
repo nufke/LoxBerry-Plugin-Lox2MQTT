@@ -61,7 +61,7 @@ Where `loxone` is the MQTT topic indicating a Miniserver message, `0123456789AB`
 In case the configuration option **Use control category and room as MQTT subtopic names** is enabled, the topic structure is:
 
 ```
-<mqttTopic>/<serialnr>/<category>/<room>/<controlname>[/<subcontrolname>]/states/<statename> <value>
+<mqttTopic>/<serialnr>/<category>/<room>/<control>[/<subcontrol>]/states/<state> <value>
 ```
 
 For each control, the `category` and `room` name will added as subtopic. In case the control has subcontrols, the name of the subcontrol is added as subtopic. The name of the control state can be found in the Loxone structure file `LoxAPP3.json`. The names for `category`, `room`, `control` and `subcontrol` are convered into *slug* format, which means text is converted to lowercase, whitespaces are replaced by dash symbols, and special characters are removed.
