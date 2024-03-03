@@ -66,6 +66,14 @@ In case the configuration option **Use control category and room as MQTT subtopi
 
 For each control, the `category` and `room` name will added as subtopic. In case the control has subcontrols, the name of the subcontrol is added as subtopic. The name of the control state can be found in the Loxone structure file `LoxAPP3.json`. The names for `category`, `room`, `control` and `subcontrol` are convered into *slug* format, which means text is converted to lowercase, whitespaces are replaced by dash symbols, and special characters are removed.
 
+**Example**
+
+```
+loxone/0123456789AB/sensor/living-room/co2/states/value 3
+```
+
+In this example, `loxone` is the MQTT topic indicating a Miniserver message, `0123456789AB` is the Miniserver serial nr., `sensor` is the category, the room is `living-room` and the name of the control is `co2`. The published `value` for the state is 3.
+
 ## Broadcasting Miniserver structure over MQTT
 
 Broadcasting the Miniserver structure might be relevant for MQTT subscribers such as mobile apps to receive information on the available controls, their properties, capabilties and states. If enabled, the Miniserver structure (`LoxAPP3.json`) is broadcasted over MQTT, but only once, at plugin startup. It uses the following topic structure:
