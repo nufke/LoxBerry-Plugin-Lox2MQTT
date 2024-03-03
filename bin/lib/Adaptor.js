@@ -111,15 +111,25 @@ Adaptor.prototype.processStates = function(control, ctrlName) {
       let state = control.states[key];
       if (Array.isArray(state)) { // check if array, then unroll array
         state.forEach( (element, index) => {
-          let namedTopic = ctrlName + '/' + key + '/' + index;
-          this.uuid2topic[element] = namedTopic;
+          let topic = '/states/' + key + '/' + index;
+          this.registerUuid(element, ctrlName, topic);
         });
       } else {
-        let namedTopic = ctrlName + '/' + key;
-        this.uuid2topic[state] = namedTopic;
+        let topic = '/states/' + key;
+        this.registerUuid(state, ctrlName, topic);
       }
     });
   }
+}
+
+Adaptor.prototype.registerUuid = function(uuid, topicPath, topic) {
+  let fullPath = topicPath + topic;
+  const found = Object.values(this.uuid2topic).filter( path => path === fullPath);
+  if (found.length != 0) {
+    fullPath += '-' + String(found.length);
+  }
+  console.log('register:', uuid, fullPath);
+  this.uuid2topic[uuid] = fullPath;
 }
 
 Adaptor.prototype.addControl = function(control, subcontrol = undefined) {
@@ -143,10 +153,10 @@ Adaptor.prototype.addControl = function(control, subcontrol = undefined) {
   if (subcontrol) namedTopic += '/' + slugify(subcontrol.name);
 
   this.path2control[path] = control;
-  this.uuid2topic[control.uuidAction] = namedTopic;
+  this.registerUuid(control.uuidAction, namedTopic, '');
   this.controlList.push(control.uuidAction);
   
-  if (control && control.states) {
+  if (control && control.states && !subcontrol) {
     this.processStates(control, namedTopic);
   }
 
