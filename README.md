@@ -24,6 +24,8 @@ Use the LoxBerry plugin webpage to configure the communication using MQTT. The p
 
     * **Publish control state changes**: the Miniserver control state changes are published over MQTT (default: false)
 
+    * **Use control category and room as MQTT subtopic names**: Instead of using the control state `uuid`, use the control category and room names as subtopics (default: false)
+
     * **Retain published MQTT messages**: Published MQTT messages will be retained by the MQTT server (default: false)
 
     * **Subscribe to MQTT to control the Miniserver**: Control commands sent over MQTT will control the Miniserver (default: false)
@@ -55,6 +57,14 @@ loxone/0123456789AB/01234567-abcd-0123-ffffeeeeddddcccc 0.8431345820426941
 ```
 
 Where `loxone` is the MQTT topic indicating a Miniserver message, `0123456789AB` is the Miniserver serial nr., and `01234567-abcd-0123-ffffeeeeddddcccc` the uuid of the control state, and the value is `0.8431345820426941`.
+
+In case the configuration option **Use control category and room as MQTT subtopic names** is enabled, the topic structure is:
+
+```
+<mqttTopic>/<serialnr>/<category>/<room>/<controlname>[/<subcontrolname>]/states/<statename> <value>
+```
+
+For each control, the `category` and `room` name will added as subtopic. In case the control has subcontrols, the name of the subcontrol is added as subtopic. The name of the control state can be found in the Loxone structure file `LoxAPP3.json`. The names for `category`, `room`, `control` and `subcontrol` are convered into *slug* format, which means text is converted to lowercase, whitespaces are replaced by dash symbols, and special characters are removed.
 
 ## Broadcasting Miniserver structure over MQTT
 
