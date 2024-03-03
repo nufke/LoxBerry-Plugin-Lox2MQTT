@@ -105,17 +105,17 @@ Adaptor.prototype.buildPaths = function() {
   }, this);
 };
 
-Adaptor.prototype.processStates = function(control, ctrlName) {
+Adaptor.prototype.processStates = function(control, ctrlName, subTopicName) {
   if (control.states) {
     Object.keys(control.states).forEach(key => {
       let state = control.states[key];
       if (Array.isArray(state)) { // check if array, then unroll array
         state.forEach( (element, index) => {
-          let topic = '/states/' + key + '/' + index;
+          let topic = subTopicName + '/states/' + key + '/' + index;
           this.registerUuid(element, ctrlName, topic);
         });
       } else {
-        let topic = '/states/' + key;
+        let topic = subTopicName + '/states/' + key;
         this.registerUuid(state, ctrlName, topic);
       }
     });
@@ -123,13 +123,12 @@ Adaptor.prototype.processStates = function(control, ctrlName) {
 }
 
 Adaptor.prototype.registerUuid = function(uuid, topicPath, topic) {
-  let fullPath = topicPath + topic;
-  const found = Object.values(this.uuid2topic).filter( path => path === fullPath);
+  let path = topicPath;
+  const found = Object.values(this.uuid2topic).filter( path => path === (topicPath + topic));
   if (found.length != 0) {
-    fullPath += '-' + String(found.length);
+    path += '-' + String(found.length);
   }
-  console.log('register:', uuid, fullPath);
-  this.uuid2topic[uuid] = fullPath;
+  this.uuid2topic[uuid] = path + topic;
 }
 
 Adaptor.prototype.addControl = function(control, subcontrol = undefined) {
@@ -150,18 +149,19 @@ Adaptor.prototype.addControl = function(control, subcontrol = undefined) {
   let namedTopic = this.mqttTopic + '/' + this.msSerialNr + '/' +
     slugify(this.cats[control.cat]) + '/' + slugify(this.rooms[control.room]) + '/' + slugify(control.name);
 
-  if (subcontrol) namedTopic += '/' + slugify(subcontrol.name);
+  let subControlName = '';
+  if (subcontrol) subControlName = '/' + slugify(subcontrol.name);
 
   this.path2control[path] = control;
-  this.registerUuid(control.uuidAction, namedTopic, '');
+  this.registerUuid(control.uuidAction, namedTopic, subControlName);
   this.controlList.push(control.uuidAction);
   
   if (control && control.states && !subcontrol) {
-    this.processStates(control, namedTopic);
+    this.processStates(control, namedTopic, subControlName);
   }
 
   if (subcontrol && subcontrol.states) {
-    this.processStates(subcontrol, namedTopic);
+    this.processStates(subcontrol, namedTopic, subControlName);
   }
 
 };
