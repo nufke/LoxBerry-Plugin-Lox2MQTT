@@ -106,6 +106,26 @@ loxone/0123456789AB/01234567-abcd-0123-ffffeeeeddddcccc/cmd Off
 
 In this example, a switch on Miniserver `0123456789AB` with uuid `01234567-abcd-0123-ffffeeeeddddcccc` is switched `Off`.
 
+In case the configuration option **Use control category and room as MQTT subtopic names** is enabled, the following topic structure can be used to control the Miniserver:
+
+```
+<mqttTopic>/<serialnr>/<category>/<room>/<control>/cmd <command>
+```
+or
+```
+<mqttTopic>/<serialnr>/<category>/<room>/<control>/<subcontrol>/cmd <command>
+```
+
+For each control, the `category` and `room` and `control` name is added as subtopic. In case the control has subcontrols, the name of the subcontrol is added.
+
+**Example**
+
+```
+loxone/0123456789AB/lighting/living-room/ceiling On
+```
+
+In this example, the command is published for a Miniserver with serial nr `0123456789AB`. `lighting` is the category, the room is `living-room` and the name of the control (switch) is `ceiling`. The command is `On`.
+
 ## FAQ
 
 **Q: What is the difference between the LoxBerry MQTT Widget and Lox2MQTT?**

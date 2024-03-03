@@ -57,7 +57,7 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
         }
       }).then( response => {
         if (response.status !== 200) {
-          app.logger.error('Fetch error. Status code: ' + response.status);
+          app.logger.error('Error fetching securedDetails for control ' + uuid + '. Status code: ' + response.status);
           return;
         }
         response.json().then( data => {
@@ -85,7 +85,7 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
         }
       }).then( response => {
         if (response.status !== 200) {
-          app.logger.error('Fetch error. Status code: ' + response.status);
+          app.logger.error('Error fetching history for control ' + uuid + '. Status code: ' + response.status);
           return;
         }
         response.json().then( data => {
