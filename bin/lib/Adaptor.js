@@ -143,11 +143,11 @@ Adaptor.prototype.processStates = function(control, ctrlName, subTopicName) {
       let state = control.states[key];
       if (Array.isArray(state)) { // check if array, then unroll array
         state.forEach( (element, index) => {
-          let topic = subTopicName + '/states/' + key + '/' + index;
+          let topic = subTopicName + '/' + key + '/' + index;
           this.registerUuid(element, ctrlName, topic);
         });
       } else {
-        let topic = subTopicName + '/states/' + key;
+        let topic = subTopicName + '/' + key;
         this.registerUuid(state, ctrlName, topic);
       }
     });
