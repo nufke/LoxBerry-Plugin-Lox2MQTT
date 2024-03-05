@@ -1,7 +1,8 @@
 const util = require('util');
 const events = require('events');
 
-const Adaptor = function(structure, mqttTopic) {
+const Adaptor = function(app, structure, mqttTopic) {
+  this.app = app;
   this.structure = structure;
   this.mqttTopic = mqttTopic;
   this.msSerialNr = this.structure.msInfo.serialNr;
@@ -88,8 +89,25 @@ Adaptor.prototype.getTopics = function() {
   ]
 };
 
-Adaptor.prototype.publishStructure = function() { // NOTE: we publish the original structure
+Adaptor.prototype.publishStructure = function() { // publish the original structure
   this.emit('publish_structure', this.mqttTopic + '/' + this.msSerialNr + '/structure', JSON.stringify(this.structure));
+};
+
+Adaptor.prototype.publishMapping = function() { // publish the mapping table
+  this.emit('publish_mapping', this.mqttTopic + '/' + this.msSerialNr + '/mapping', JSON.stringify(this.uuid2topic));
+};
+
+Adaptor.prototype.readMapping= function(mapping) { // publish the mapping table
+  let map;
+  try {
+    map = JSON.parse(mapping);
+  } catch(error) {
+    this.app.logger.error("MQTT Adaptor - Error in received topic mapping table. Skipped");
+  }
+  if (map) {
+    this.uuid2topic = map;
+    this.app.logger.info("MQTT Adaptor - Topic mapping table read");
+  }
 };
 
 Adaptor.prototype.buildPaths = function() {

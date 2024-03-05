@@ -111,7 +111,7 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
       msAdapter.clear();
     }
 
-    msAdapter = new Adaptor(structure, mqttTopic);
+    msAdapter = new Adaptor(app, structure, mqttTopic);
     msSerialNr = msAdapter.getSerialnr();
 
     if (config.miniserver[msid].subscribe) {
@@ -123,6 +123,14 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
         publishTopic(topic, data);
       } else {
         app.logger.debug("MQTT Adaptor - Publising control states has been disabled by the user settings");
+      }
+    });
+
+    msAdapter.on('publish_mapping', function(topic, data) {
+      if (config.miniserver[msid].publish_mapping) {
+        publishTopic(topic, data);
+      } else {
+        app.logger.debug("MQTT Adaptor - Publising mapping table has been disabled by the user settings");
       }
     });
 
@@ -138,6 +146,7 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
 
     msAdapter.publishStructure();
     msAdapter.publishStates();
+    msAdapter.publishMapping();
   });
 
   mqttClient.on('connect', function(conack) {
@@ -147,6 +156,18 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
   });
 
   mqttClient.on('message', function(topic, message, packet) {
+    // trigger to publish states
+    if (msAdapter && message.length && (topic.search(mqttTopic + "/" + msSerialNr + "/states/cmd") > -1)) {
+      msAdapter.publishStates();
+      return;
+    }
+
+    // import user-mapping mapping
+    if (msAdapter && message.length && (topic.search(mqttTopic + "/" + msSerialNr + "/mapping/cmd") > -1)) {
+      msAdapter.readMapping(message.toString());
+      return;
+    }
+
     // only send to Miniserver if adapter exists and the serial number in the topic matches
     if (msAdapter && message.length && (topic.search(mqttTopic + "/" + msSerialNr) > -1)) {
       let control = msAdapter.getControlFromTopic(topic, message.toString());
@@ -165,10 +186,6 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
       } else {
         app.logger.debug("MQTT Adaptor - Miniserver in readonly mode");
       }
-    }
-    // trigger to publish states
-    if (msAdapter && message.length && (topic.search(mqttTopic + "/" + msSerialNr + "/states/cmd") > -1)) {
-      msAdapter.publishStates();
     }
   });
 

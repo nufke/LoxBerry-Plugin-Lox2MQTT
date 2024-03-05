@@ -36,6 +36,7 @@ function updateConfig(config) {
         enabled: true,
         mqtt_topic_ms: "loxone",
         publish_structure: false,
+        publish_mapping: false,
         publish_states: false,
         publish_topic_names: false,
         retain_message: false,
@@ -51,6 +52,7 @@ function updateConfig(config) {
       if (!ms.enabled) ms.enabled = true;
       if (!ms.mqtt_topic_ms) ms.mqtt_topic_ms = "loxone";
       if (!ms.publish_structure) ms.publish_structure = false;
+      if (!ms.publish_mapping) ms.publish_mapping = false;
       if (!ms.publish_states) ms.publish_states = false;
       if (!ms.publish_topic_names) ms.publish_topic_names = false;
       if (!ms.retain_message) ms.retain_message = false;
