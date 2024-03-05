@@ -157,13 +157,14 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
 
   mqttClient.on('message', function(topic, message, packet) {
     // trigger to publish states
-    if (msAdapter && message.length && (topic.search(mqttTopic + "/" + msSerialNr + "/states/cmd") > -1)) {
+    if (msAdapter && message.length && (topic.search(mqttTopic + "/" + msSerialNr + "/states/cmd" ) > -1)) {
       msAdapter.publishStates();
       return;
     }
 
-    // import user-mapping mapping
-    if (msAdapter && message.length && (topic.search(mqttTopic + "/" + msSerialNr + "/mapping/cmd") > -1)) {
+    // override mapping with user-defined mapping
+    if (msAdapter && config.miniserver[msid].publish_mapping &&
+        message.length && (topic.search(mqttTopic + "/" + msSerialNr + "/mapping/cmd") > -1)) {
       msAdapter.readMapping(message.toString());
       return;
     }
