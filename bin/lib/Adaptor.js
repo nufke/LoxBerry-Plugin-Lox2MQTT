@@ -1,5 +1,7 @@
 const util = require('util');
 const events = require('events');
+const fs = require('fs');
+const directories = require('./directories');
 
 const Adaptor = function(app, structure, mqttTopic) {
   this.app = app;
@@ -12,6 +14,16 @@ const Adaptor = function(app, structure, mqttTopic) {
   this.rooms = {};
   this.cats = {};
   this.states = {};
+  this.dataFile = `${directories.data}/${this.msSerialNr}_mapping.json`;
+
+  try {
+    const data = fs.readFileSync(this.dataFile);
+    this.uuid2topic = JSON.parse(data);
+    this.app.logger.info("MQTT Adaptor - Loading stored topic mapping table");
+  } catch (error) {
+    this.app.logger.error("MQTT Adaptor - Stored topic mapping table not found. Skipped");
+  }
+
   this.buildPaths();
 };
 
@@ -89,15 +101,19 @@ Adaptor.prototype.getTopics = function() {
   ]
 };
 
-Adaptor.prototype.publishStructure = function() { // publish the original structure
-  this.emit('publish_structure', this.mqttTopic + '/' + this.msSerialNr + '/structure', JSON.stringify(this.structure));
+Adaptor.prototype.publishStructure = function() { // publish the original structure (if map has entries)
+  if (this.structure && Object.keys(this.structure).length) {
+    this.emit('publish_structure', this.mqttTopic + '/' + this.msSerialNr + '/structure', JSON.stringify(this.structure));
+  }
 };
 
-Adaptor.prototype.publishMapping = function() { // publish the mapping table
-  this.emit('publish_mapping', this.mqttTopic + '/' + this.msSerialNr + '/mapping', JSON.stringify(this.uuid2topic));
+Adaptor.prototype.publishMapping = function() { // publish the mapping table (if map has entries)
+  if (this.uuid2topic && Object.keys(this.uuid2topic).length) {
+    this.emit('publish_mapping', this.mqttTopic + '/' + this.msSerialNr + '/mapping', JSON.stringify(this.uuid2topic));
+  }
 };
 
-Adaptor.prototype.readMapping= function(mapping) { // publish the mapping table
+Adaptor.prototype.processMapping = function(mapping) { // publish the mapping table
   let map;
   try {
     map = JSON.parse(mapping);
@@ -107,6 +123,12 @@ Adaptor.prototype.readMapping= function(mapping) { // publish the mapping table
   if (map) {
     this.uuid2topic = map;
     this.app.logger.info("MQTT Adaptor - Topic mapping table read");
+    try {
+      fs.writeFileSync(this.dataFile, JSON.stringify(map));
+      this.app.logger.info("MQTT Adaptor - Saved topic mapping table");
+    } catch(error) {
+      this.app.logger.error("MQTT Adaptor - Cannot save topic mapping table");
+    }
   }
 };
 

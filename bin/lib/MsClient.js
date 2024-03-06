@@ -165,7 +165,7 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
     // override mapping with user-defined mapping
     if (msAdapter && config.miniserver[msid].publish_mapping &&
         message.length && (topic.search(mqttTopic + "/" + msSerialNr + "/mapping/cmd") > -1)) {
-      msAdapter.readMapping(message.toString());
+      msAdapter.processMapping(message.toString());
       return;
     }
 
