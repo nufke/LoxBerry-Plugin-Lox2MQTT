@@ -49,6 +49,16 @@ PLUGINNAME=$3 # name same as installation folder
 echo "<INFO> Installing dependencies..."
 npm --prefix $PBIN install --only=production
 
+echo "<INFO> Copy back existing config, data and log files..."
+cp -p -v -r /tmp/$PTEMPDIR\_upgrade/log/$PDIR/* $PLOG
+cp -p -v -r /tmp/$PTEMPDIR\_upgrade/config/$PDIR/* $PCONFIG
+cp -p -v -r /tmp/$PTEMPDIR\_upgrade/data/$PDIR/* $PDATA
+
+echo "<INFO> Remove temporary folders"
+rm -r /tmp/$PTEMPDIR\_upgrade/log
+rm -r /tmp/$PTEMPDIR\_upgrade/config
+rm -r /tmp/$PTEMPDIR\_upgrade
+
 echo "<INFO> Create default configuration..."
 node $PBIN/update_config.js
 
