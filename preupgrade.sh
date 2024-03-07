@@ -24,6 +24,7 @@ echo "<INFO> Creating temporary folders for upgrading..."
 mkdir -p /tmp/$PTEMPDIR\_upgrade
 mkdir -p /tmp/$PTEMPDIR\_upgrade/log
 mkdir -p /tmp/$PTEMPDIR\_upgrade/config
+mkdir -p /tmp/$PTEMPDIR\_upgrade/data
 
 echo "<INFO> Backing up existing config, data and log files..."
 cp -p -v -r $PLOG /tmp/$PTEMPDIR\_upgrade/log
