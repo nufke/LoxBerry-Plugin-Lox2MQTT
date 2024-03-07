@@ -3,8 +3,9 @@ const events = require('events');
 const fs = require('fs');
 const directories = require('./directories');
 
-const Adaptor = function(app, structure, mqttTopic) {
+const Adaptor = function(app, configMs, structure, mqttTopic) {
   this.app = app;
+  this.useMapping = configMs.publish_mapping;
   this.structure = structure;
   this.mqttTopic = mqttTopic;
   this.msSerialNr = this.structure.msInfo.serialNr;
@@ -15,13 +16,17 @@ const Adaptor = function(app, structure, mqttTopic) {
   this.cats = {};
   this.states = {};
   this.dataFile = `${directories.data}/${this.msSerialNr}_mapping.json`;
+  this.useMappingFile = false;
 
-  try {
-    const data = fs.readFileSync(this.dataFile);
-    this.uuid2topic = JSON.parse(data);
-    this.app.logger.info("MQTT Adaptor - Loading stored topic mapping table");
-  } catch (error) {
-    this.app.logger.error("MQTT Adaptor - Stored topic mapping table not found. Skipped");
+  if (this.useMapping) {
+    try {
+      const data = fs.readFileSync(this.dataFile);
+      this.uuid2topic = JSON.parse(data);
+      this.app.logger.info("MQTT Adaptor - Loading stored topic mapping table");
+      this.useMappingFile = true;
+    } catch (error) {
+      this.app.logger.error("MQTT Adaptor - Stored topic mapping table not found. Skipped");
+    }
   }
 
   this.buildPaths();
@@ -123,6 +128,7 @@ Adaptor.prototype.processMapping = function(mapping) { // publish the mapping ta
   if (map) {
     this.uuid2topic = map;
     this.app.logger.info("MQTT Adaptor - Topic mapping table read");
+    this.useMappingFile = true;
     try {
       fs.writeFileSync(this.dataFile, JSON.stringify(map));
       this.app.logger.info("MQTT Adaptor - Saved topic mapping table");
@@ -163,6 +169,7 @@ Adaptor.prototype.processStates = function(control, ctrlName, subTopicName) {
   if (control.states) {
     Object.keys(control.states).forEach(key => {
       let state = control.states[key];
+      this.app.logger.debug("MQTT Adaptor - state found, key:" + key + ", state: " + state);
       if (Array.isArray(state)) { // check if array, then unroll array
         state.forEach( (element, index) => {
           let topic = subTopicName + '/' + key + '/' + index;
@@ -177,6 +184,7 @@ Adaptor.prototype.processStates = function(control, ctrlName, subTopicName) {
 }
 
 Adaptor.prototype.registerUuid = function(uuidPath, topicPath, subControlPath) {
+  this.app.logger.debug("MQTT Adaptor - registerUuid for " + topicPath + subControlPath);
   let path = topicPath;
   const found = Object.values(this.uuid2topic).filter( path => path === (topicPath + subControlPath));
   if (found.length != 0) {
@@ -200,23 +208,25 @@ Adaptor.prototype.addControl = function(control, subcontrol = undefined) {
   
   const uuidPath = this.mqttTopic + '/' + this.msSerialNr + '/' + control.uuidAction;
   
-  let topicPath = this.mqttTopic + '/' + this.msSerialNr + '/' +
-    slugify(this.cats[control.cat]) + '/' + slugify(this.rooms[control.room]) + '/' + slugify(control.name);
-
-  let subControlPath = '';
-  if (subcontrol) subControlPath = '/' + slugify(subcontrol.name);
-
   this.path2control[uuidPath] = control;
-  this.registerUuid(uuidPath, topicPath, subControlPath);
   
-  if (control && control.states && !subcontrol) {
-    this.processStates(control, topicPath, subControlPath);
-  }
+  if (!this.useMappingFile && this.useMapping) {
+    let topicPath = this.mqttTopic + '/' + this.msSerialNr + '/' +
+      slugify(this.cats[control.cat]) + '/' + slugify(this.rooms[control.room]) + '/' + slugify(control.name);
 
-  if (subcontrol && subcontrol.states) {
-    this.processStates(subcontrol, topicPath, subControlPath);
-  }
+    let subControlPath = '';
+    if (subcontrol) subControlPath = '/' + slugify(subcontrol.name);
 
+    this.registerUuid(uuidPath, topicPath, subControlPath);
+
+    if (control && control.states && !subcontrol) {
+      this.processStates(control, topicPath, subControlPath);
+    }
+
+    if (subcontrol && subcontrol.states) {
+      this.processStates(subcontrol, topicPath, subControlPath);
+    }
+  }
 };
 
 module.exports = Adaptor;

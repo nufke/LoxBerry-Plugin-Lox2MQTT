@@ -111,7 +111,7 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
       msAdapter.clear();
     }
 
-    msAdapter = new Adaptor(app, structure, mqttTopic);
+    msAdapter = new Adaptor(app, config.miniserver[msid], structure, mqttTopic);
     msSerialNr = msAdapter.getSerialnr();
 
     if (config.miniserver[msid].subscribe) {
