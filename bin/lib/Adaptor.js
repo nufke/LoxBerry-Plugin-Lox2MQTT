@@ -17,7 +17,8 @@ const Adaptor = function(app, configMs, structure, mqttTopic) {
   this.states = {};
   this.dataFile = `${directories.data}/${this.msSerialNr}_mapping.json`;
   this.useMappingFile = false;
-
+  this.topicPrefix = this.mqttTopic + '/' + this.msSerialNr + '/';
+  
   if (this.useMapping) {
     try {
       const data = fs.readFileSync(this.dataFile);
@@ -39,7 +40,7 @@ Adaptor.prototype.clear = function() {
 };
 
 Adaptor.prototype.setValueForUuid = function(uuid, value, publishTopicName) {
-  let topic = this.mqttTopic + '/' + this.msSerialNr + '/' + uuid;
+  let topic = this.topicPrefix + uuid;
   if (publishTopicName && this.uuid2topic[topic]) {
     topic = this.uuid2topic[topic];
   }
@@ -48,7 +49,7 @@ Adaptor.prototype.setValueForUuid = function(uuid, value, publishTopicName) {
 };
 
 Adaptor.prototype.publishStates = function() {
-  this.emit('publish_state', this.mqttTopic + '/' + this.msSerialNr + '/states', JSON.stringify(this.states));
+  this.emit('publish_state', this.topicPrefix + 'states', JSON.stringify(this.states));
 };
 
 Adaptor.prototype.getSerialnr = function() {
@@ -108,13 +109,13 @@ Adaptor.prototype.getTopics = function() {
 
 Adaptor.prototype.publishStructure = function() { // publish the original structure (if map has entries)
   if (this.structure && Object.keys(this.structure).length) {
-    this.emit('publish_structure', this.mqttTopic + '/' + this.msSerialNr + '/structure', JSON.stringify(this.structure));
+    this.emit('publish_structure', this.topicPrefix + 'structure', JSON.stringify(this.structure));
   }
 };
 
 Adaptor.prototype.publishMapping = function() { // publish the mapping table (if map has entries)
   if (this.uuid2topic && Object.keys(this.uuid2topic).length) {
-    this.emit('publish_mapping', this.mqttTopic + '/' + this.msSerialNr + '/mapping', JSON.stringify(this.uuid2topic));
+    this.emit('publish_mapping', this.topicPrefix + 'mapping', JSON.stringify(this.uuid2topic));
   }
 };
 
@@ -159,9 +160,12 @@ Adaptor.prototype.buildPaths = function() {
     }
   });
 
-  this.path2control['globalstates'] = this.structure.globalStates;
+  this.path2control["globalstates"] = this.structure.globalStates;
   Object.keys(this.structure.globalStates).forEach(function(key) {
-    this.stateuuid2path[that.structure.globalStates[key]] = 'globalstates/' + key;
+    const uuid = that.structure.globalStates[key];
+    const topicPath = this.topicPrefix + "globalstates/" + key;
+    this.stateuuid2path[uuid] = "globalstates/" + key;
+    this.registerUuid(this.topicPrefix + uuid, topicPath, "");
   }, this);
 };
 
@@ -173,11 +177,11 @@ Adaptor.prototype.processStates = function(control, ctrlName, subTopicName) {
       if (Array.isArray(state)) { // check if array, then unroll array
         state.forEach( (element, index) => {
           let topic = subTopicName + '/' + key + '/' + index;
-          this.registerUuid(element, ctrlName, topic);
+          this.registerUuid(this.topicPrefix + element, ctrlName, topic);
         });
       } else {
         let topic = subTopicName + '/' + key;
-        this.registerUuid(state, ctrlName, topic);
+        this.registerUuid(this.topicPrefix + state, ctrlName, topic);
       }
     });
   }
@@ -206,13 +210,13 @@ Adaptor.prototype.addControl = function(control, subcontrol = undefined) {
       .replace(/-+/g, '-'); // remove consecutive hyphens
   }
   
-  const uuidPath = this.mqttTopic + '/' + this.msSerialNr + '/' + control.uuidAction;
+  const uuidPath = this.topicPrefix + control.uuidAction;
   
   this.path2control[uuidPath] = control;
   
   if (!this.useMappingFile && this.useMapping) {
-    let topicPath = this.mqttTopic + '/' + this.msSerialNr + '/' +
-      slugify(this.cats[control.cat]) + '/' + slugify(this.rooms[control.room]) + '/' + slugify(control.name);
+    let topicPath = this.topicPrefix + slugify(this.cats[control.cat]) + '/' + 
+      slugify(this.rooms[control.room]) + '/' + slugify(control.name);
 
     let subControlPath = '';
     if (subcontrol) subControlPath = '/' + slugify(subcontrol.name);
