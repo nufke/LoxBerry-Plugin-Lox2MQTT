@@ -61,7 +61,7 @@ Where `loxone` is the MQTT topic indicating a Miniserver message, `0123456789AB`
 In case the configuration option **Use control category and room as MQTT subtopic names** is enabled, the topic structure is:
 
 ```
-<mqttTopic>/<serialnr>/<category>/<room>/<control>[/<subcontrol>]/states/<state> <value>
+<mqttTopic>/<serialnr>/<category>/<room>/<control>[/<subcontrol>]/<state> <value>
 ```
 
 For each control, the `category` and `room` name will added as subtopic. In case the control has subcontrols, the name of the subcontrol is added as subtopic. The name of the control state can be found in the Loxone structure file `LoxAPP3.json`. The names for `category`, `room`, `control` and `subcontrol` are convered into *slug* format, which means text is converted to lowercase, whitespaces are replaced by dash symbols, and special characters are removed.
@@ -69,10 +69,10 @@ For each control, the `category` and `room` name will added as subtopic. In case
 **Example**
 
 ```
-loxone/0123456789AB/sensor/living-room/co2/states/value 3
+loxone/0123456789AB/sensor/living-room/co2/value 3
 ```
 
-In this example, `loxone` is the MQTT topic indicating a Miniserver message, `0123456789AB` is the Miniserver serial nr., `sensor` is the category, the room is `living-room` and the name of the control is `co2`. The published `value` for the state is 3.
+In this example, `loxone` is the MQTT topic indicating a Miniserver message, `0123456789AB` is the Miniserver serial nr., the control with name `co2` is an analog sensor input (of type `InfoOnlyAnalog`), assigned to category `sensor` and room `living-room`. The published `value` for the analog input is 3.
 
 ## Broadcasting Miniserver structure over MQTT
 
@@ -109,11 +109,11 @@ In this example, a switch on Miniserver `0123456789AB` with uuid `01234567-abcd-
 In case the configuration option **Use control category and room as MQTT subtopic names** is enabled, the following topic structure can be used to control the Miniserver:
 
 ```
-<mqttTopic>/<serialnr>/<category>/<room>/<control>/cmd <command>
+<mqttTopic>/<serialnr>/<category>/<room>/<control>/<state>/cmd <command>
 ```
 or
 ```
-<mqttTopic>/<serialnr>/<category>/<room>/<control>/<subcontrol>/cmd <command>
+<mqttTopic>/<serialnr>/<category>/<room>/<control>/<subcontrol>/<state>/cmd <command>
 ```
 
 For each control, the `category` and `room` and `control` name is added as subtopic. In case the control has subcontrols, the name of the subcontrol is added.
@@ -121,10 +121,10 @@ For each control, the `category` and `room` and `control` name is added as subto
 **Example**
 
 ```
-loxone/0123456789AB/lighting/living-room/ceiling On
+loxone/0123456789AB/lighting/living-room/ceiling/active/cmd On
 ```
 
-In this example, the command is published for a Miniserver with serial nr `0123456789AB`. `lighting` is the category, the room is `living-room` and the name of the control (switch) is `ceiling`. The command is `On`.
+In this example, the command is published for a Miniserver with serial nr `0123456789AB` and the control with name `ceiling` (of type `Switch`), assigned to category `lighting`, and room `living-room`. The state for the switch is called `active`. It can be activated sending the command `On`.
 
 ## FAQ
 
@@ -134,11 +134,11 @@ A: The LoxBerry MQTT Widget communicates to the Miniserver via HTTP Virtual Inpu
 
 **Q: I receive state information from my Miniserver over MQTT, but I do not recognize the format and identifiers**
 
-A: A received MQTT message has the following format: `<mqttTopic>/<serialnr>/<uuid> <value>`. Each MQTT message uses the Miniserver topic name (`mqttTopic`) as defined in the plugin configuration to identify messages coming from a Loxone Miniserver. The next topic level specifies the serial number (`serialnr`) of your Miniserver, followed by the unique identifier (`uuid`) representing a control state as defined in the Loxone structure file `LoxAPP3.json` on your Miniserver.
+A: A received MQTT message has the following format: `<mqttTopic>/<serialnr>/<uuid> <value>`. Each MQTT message uses the Miniserver topic name (`mqttTopic`) as defined in the plugin configuration to identify messages coming from a Loxone Miniserver. The next topic level specifies the serial number (`serialnr`) of your Miniserver, followed by the unique identifier (`uuid`) representing a control state as defined in the Loxone structure file `LoxAPP3.json` on your Miniserver. In case you prefer to see the the `category`, `room` and `control` name as subtopics, you can enable the option **Use control category and room as MQTT subtopic names** at the plugin configuration page. In this case, the MQTT message format becomes `<mqttTopic>/<serialnr>/<category>/<room>/<control>[/<subcontrol>]/<state> <value>`.
 
 **Q: Can I change the Miniserver control states via MQTT?**
 
-A: Yes, you can send MQTT messages which are converted to commands for the Loxone Miniserver. A transmited MQTT message should have the following format: `<mqttTopic>/<serialnr>/<uuid>/cmd <command>`. Note the command extension (`/cmd`) in this message, which has been added to the unique identifier of a control or subcontrol. The allowed values for `command` are defined in the [Loxone Structure File](https://www.loxone.com/wp-content/uploads/datasheets/StructureFile.pdf).
+A: Yes, you can send MQTT messages which are converted to commands for the Loxone Miniserver. A transmited MQTT message should have the following format: `<mqttTopic>/<serialnr>/<uuid>/cmd <command>`. Note the command extension (`/cmd`) as subtopic, which has been added to the unique identifier of a control or subcontrol. The allowed values for `command` are defined in the [Loxone Structure File](https://www.loxone.com/wp-content/uploads/datasheets/StructureFile.pdf). In case the option **Use control category and room as MQTT subtopic names** is enabled, the control format becomes `<mqttTopic>/<serialnr>/<category>/<room>/<control>[/<subcontrol>]/<state>/cmd <command>`.
 
 **Q: Where can I find my Loxone Miniserver structure file `LoxAPP3.json`?**
 
