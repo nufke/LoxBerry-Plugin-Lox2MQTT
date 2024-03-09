@@ -146,6 +146,6 @@ The logging capabilites are based on the [LoxBerry message-center plugin](https:
 
 Please submit your issues and questions via the GitHub issue tracker: https://github.com/nufke/LoxBerry-Plugin-Lox2MQTT/issues or use https://www.loxforum.com
 
-## Happy with the plugin and willing to support the development?
+**Happy with the plugin and willing to support the development?**
 
 <a href="https://www.buymeacoffee.com/nufke" target="_blank"><img src="./icons/svg/bmc.svg" alt="Buy Me A Coffee"></a>
