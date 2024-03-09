@@ -64,7 +64,7 @@ In case the configuration option **Use control category and room as MQTT subtopi
 <mqttTopic>/<serialnr>/<category>/<room>/<control>[/<subcontrol>]/<state> <value>
 ```
 
-For each control, the `category` and `room` name will added as subtopic. In case the control has subcontrols, the name of the subcontrol is added as subtopic. The name of the control state can be found in the Loxone structure file `LoxAPP3.json`. The names for `category`, `room`, `control` and `subcontrol` are convered into *slug* format, which means text is converted to lowercase, whitespaces are replaced by dash symbols, and special characters are removed.
+For each control, the `category` and `room` name will added as subtopic. In case the control has subcontrols, the name of the subcontrol is added as subtopic. The name of the control state can be found in the Loxone structure file `LoxAPP3.json`. The names for `category`, `room`, `control` and `subcontrol` are in *slug* format, which means text is converted to lowercase, whitespaces are replaced by dash symbols, and special characters are removed.
 
 **Example**
 
@@ -89,14 +89,10 @@ If enabled, the Miniserver structure is retained by the MQTT server. This enable
 To control a Loxone Miniserver, a message should be send using the following topic structure:
 
 ```
-<mqttTopic>/<serialnr>/<uuid>/cmd <command>
-```
-or
-```
-<mqttTopic>/<serialnr>/<uuid>/<subcontrol>/cmd <command>
+<mqttTopic>/<serialnr>/<uuid>[/<subcontrol>]/cmd <command>
 ```
 
-Note that Loxone subcontrols share the same `uuid` inherited from the parent control, and therefore define an additional string `subcontrol`. The name for the `subcontrol` can be found in the Loxone Miniserver structure file `LoxAPP3.json` listed under the `uuid` of the parent control.
+In case the control has subcontrols, the name of the subcontrol should added. Note that Loxone subcontrols share the same `uuid` inherited from the parent control, and therefore define an additional string `subcontrol`. The name for the `subcontrol` can be found in the Loxone Miniserver structure file `LoxAPP3.json` listed under the `uuid` of the parent control.
 
 **Example**
 
@@ -109,14 +105,10 @@ In this example, a switch on Miniserver `0123456789AB` with uuid `01234567-abcd-
 In case the configuration option **Use control category and room as MQTT subtopic names** is enabled, the following topic structure can be used to control the Miniserver:
 
 ```
-<mqttTopic>/<serialnr>/<category>/<room>/<control>/<state>/cmd <command>
-```
-or
-```
-<mqttTopic>/<serialnr>/<category>/<room>/<control>/<subcontrol>/<state>/cmd <command>
+<mqttTopic>/<serialnr>/<category>/<room>/<control>[/<subcontrol>]/<state>/cmd <command>
 ```
 
-For each control, the `category` and `room` and `control` name is added as subtopic. In case the control has subcontrols, the name of the subcontrol is added.
+For each control, the `category` and `room` and `control` name is added as subtopic. In case the control has subcontrols, the name of the subcontrol should be added.
 
 **Example**
 
@@ -154,5 +146,6 @@ The logging capabilites are based on the [LoxBerry message-center plugin](https:
 
 Please submit your issues and questions via the GitHub issue tracker: https://github.com/nufke/LoxBerry-Plugin-Lox2MQTT/issues or use https://www.loxforum.com
 
+## Happy with the plugin and willing to support the development?
 
 <a href="https://www.buymeacoffee.com/nufke" target="_blank"><img src="./icons/svg/bmc.svg" alt="Buy Me A Coffee"></a>
