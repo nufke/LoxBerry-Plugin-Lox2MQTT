@@ -163,9 +163,13 @@ Adaptor.prototype.buildPaths = function() {
   this.path2control["globalstates"] = this.structure.globalStates;
   Object.keys(this.structure.globalStates).forEach(function(key) {
     const uuid = that.structure.globalStates[key];
-    const topicPath = this.topicPrefix + "globalstates/" + key;
-    this.stateuuid2path[uuid] = "globalstates/" + key;
-    this.registerUuid(this.topicPrefix + uuid, topicPath, "");
+    const path = "globalstates/" + key;
+    const topicPath = this.topicPrefix + path;
+    this.stateuuid2path[uuid] = path;
+    
+    if (!this.useMappingFile && this.useMapping) {
+      this.registerUuid(this.topicPrefix + uuid, topicPath, "");
+    }
   }, this);
 };
 
