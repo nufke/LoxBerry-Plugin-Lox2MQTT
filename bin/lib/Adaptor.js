@@ -10,7 +10,6 @@ const Adaptor = function(app, configMs, structure, mqttTopic) {
   this.mqttTopic = mqttTopic;
   this.msSerialNr = this.structure.msInfo.serialNr;
   this.path2control = {};
-  this.stateuuid2path = {};
   this.uuid2topic = {};
   this.rooms = {};
   this.cats = {};
@@ -165,12 +164,21 @@ Adaptor.prototype.buildPaths = function() {
     const uuid = that.structure.globalStates[key];
     const path = "globalstates/" + key;
     const topicPath = this.topicPrefix + path;
-    this.stateuuid2path[uuid] = path;
     
     if (!this.useMappingFile && this.useMapping) {
       this.registerUuid(this.topicPrefix + uuid, topicPath, "");
     }
   }, this);
+  
+  Object.keys(this.structure.messageCenter).forEach( (key) => {
+    const element = that.structure.messageCenter[key];
+    this.addElement(element, "messagecenter");
+  });
+
+  Object.keys(this.structure.autopilot).forEach( (key) => {
+    const element = that.structure.autopilot[key];
+    this.addElement(element, "autopilot");
+  });
 };
 
 Adaptor.prototype.processStates = function(control, ctrlName, subTopicName) {
@@ -201,29 +209,27 @@ Adaptor.prototype.registerUuid = function(uuidPath, topicPath, subControlPath) {
   this.uuid2topic[uuidPath] = path + subControlPath;
 }
 
+Adaptor.prototype.slugify = function(str) {
+  return String(str)
+    .normalize('NFKD') // split accented characters into their base characters and diacritical marks
+    .replace(/[\u0300-\u036f]/g, '') // remove all the accents, which happen to be all in the \u03xx UNICODE block.
+    .trim() // trim leading or trailing whitespace
+    .toLowerCase() // convert to lowercase
+    .replace(/[^a-z0-9 -]/g, '') // remove non-alphanumeric characters
+    .replace(/\s+/g, '-') // replace spaces with hyphens
+    .replace(/-+/g, '-'); // remove consecutive hyphens
+}
+
 Adaptor.prototype.addControl = function(control, subcontrol = undefined) {
- 
-  function slugify(str) {
-    return String(str)
-      .normalize('NFKD') // split accented characters into their base characters and diacritical marks
-      .replace(/[\u0300-\u036f]/g, '') // remove all the accents, which happen to be all in the \u03xx UNICODE block.
-      .trim() // trim leading or trailing whitespace
-      .toLowerCase() // convert to lowercase
-      .replace(/[^a-z0-9 -]/g, '') // remove non-alphanumeric characters
-      .replace(/\s+/g, '-') // replace spaces with hyphens
-      .replace(/-+/g, '-'); // remove consecutive hyphens
-  }
-  
   const uuidPath = this.topicPrefix + control.uuidAction;
-  
   this.path2control[uuidPath] = control;
   
   if (!this.useMappingFile && this.useMapping) {
-    let topicPath = this.topicPrefix + slugify(this.cats[control.cat]) + '/' + 
-      slugify(this.rooms[control.room]) + '/' + slugify(control.name);
+    const topicPath = this.topicPrefix + this.slugify(this.cats[control.cat]) + '/' + 
+      this.slugify(this.rooms[control.room]) + '/' + this.slugify(control.name);
 
     let subControlPath = '';
-    if (subcontrol) subControlPath = '/' + slugify(subcontrol.name);
+    if (subcontrol) subControlPath = '/' + this.slugify(subcontrol.name);
 
     this.registerUuid(uuidPath, topicPath, subControlPath);
 
@@ -236,5 +242,17 @@ Adaptor.prototype.addControl = function(control, subcontrol = undefined) {
     }
   }
 };
+
+Adaptor.prototype.addElement = function(element, name) {
+  const uuidPath = this.topicPrefix + element.uuidAction;
+  if (!this.useMappingFile && this.useMapping) {
+    const topicPath = this.topicPrefix + name + "/" + this.slugify(element.name);
+    this.registerUuid(uuidPath, topicPath, "");
+    
+    if (element && element.states) {
+      this.processStates(element, topicPath, "");
+    }
+  }
+}
 
 module.exports = Adaptor;
