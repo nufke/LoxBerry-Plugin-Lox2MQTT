@@ -48,7 +48,9 @@ Adaptor.prototype.setValueForUuid = function(uuid, value, publishTopicName) {
 };
 
 Adaptor.prototype.publishStates = function() {
-  this.emit('publish_state', this.topicPrefix + 'states', JSON.stringify(this.states));
+  if (Object.keys(this.states).length) { // only publish if there is content
+    this.emit('publish_state', this.topicPrefix + 'states', JSON.stringify(this.states));
+  }
 };
 
 Adaptor.prototype.getSerialnr = function() {
@@ -92,11 +94,13 @@ Adaptor.prototype.getTopics = function() {
   // subscribe to topics. Examples:
   // <mqttTopic>/<serialnr>/<uuid>/cmd
   // <mqttTopic>/<serialnr>/states/cmd
+  // <mqttTopic>/<serialnr>/<uuid>/<state>/cmd
   // <mqttTopic>/<serialnr>/<uuid>/<subcontrol>/cmd
-  // <mqttTopic>/<serialnr>/<uuid>/<subcontrol>/states/cmd
+  // <mqttTopic>/<serialnr>/<uuid>/<subcontrol>/<state>/cmd
   // <mqttTopic>/<serialnr>/<category>/<room>/<control>/cmd
+  // <mqttTopic>/<serialnr>/<category>/<room>/<control>/<state>/cmd
   // <mqttTopic>/<serialnr>/<category>/<room>/<control>/<subcontrol>/cmd
-  // <mqttTopic>/<serialnr>/<category>/<room>/<control>/<subcontrol>/states/cmd
+  // <mqttTopic>/<serialnr>/<category>/<room>/<control>/<subcontrol>/<state>/cmd
   return [
     this.mqttTopic + '/+/+/cmd',
     this.mqttTopic + '/+/+/+/cmd',
@@ -172,13 +176,15 @@ Adaptor.prototype.buildPaths = function() {
   
   Object.keys(this.structure.messageCenter).forEach( (key) => {
     const element = that.structure.messageCenter[key];
-    this.addElement(element, "messagecenter");
+    this.addElement(element, "messagecenter", true);
   });
 
   Object.keys(this.structure.autopilot).forEach( (key) => {
     const element = that.structure.autopilot[key];
-    this.addElement(element, "autopilot");
+    this.addElement(element, "autopilot", true);
   });
+
+  this.addElement(this.structure.weatherServer, "weatherserver", false);
 };
 
 Adaptor.prototype.processStates = function(control, ctrlName, subTopicName) {
@@ -243,11 +249,17 @@ Adaptor.prototype.addControl = function(control, subcontrol = undefined) {
   }
 };
 
-Adaptor.prototype.addElement = function(element, name) {
-  const uuidPath = this.topicPrefix + element.uuidAction;
+Adaptor.prototype.addElement = function(element, name, hasUuidAction) {
+  let uuidPath;
+  if (hasUuidAction) {
+    uuidPath = this.topicPrefix + element.uuidAction;
+  }
   if (!this.useMappingFile && this.useMapping) {
-    const topicPath = this.topicPrefix + name + "/" + this.slugify(element.name);
-    this.registerUuid(uuidPath, topicPath, "");
+    let topicPath = this.topicPrefix + name;
+    if (hasUuidAction) {
+      topicPath += "/" + this.slugify(element.name);
+      this.registerUuid(uuidPath, topicPath, "");
+    }
     
     if (element && element.states) {
       this.processStates(element, topicPath, "");
