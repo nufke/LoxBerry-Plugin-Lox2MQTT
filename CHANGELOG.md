@@ -3,8 +3,9 @@
 ## v0.9.0 (BETA)
 
  * Enable option to use control category and room as MQTT subtopic names
- * update documentation (README)
- 
+ * Publish system status
+ * Update documentation (README)
+
 ## v0.8.0 (BETA)
 
  * add exception handling when MQTT server or websocket are not accessible 

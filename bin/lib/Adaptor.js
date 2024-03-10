@@ -18,6 +18,8 @@ const Adaptor = function(app, configMs, structure, mqttTopic) {
   this.useMappingFile = false;
   this.topicPrefix = this.mqttTopic + '/' + this.msSerialNr + '/';
   
+  this.systemStatesChanged = Object.values(this.structure.messageCenter).map(item => item.states.changed);
+  
   if (this.useMapping) {
     try {
       const data = fs.readFileSync(this.dataFile);
@@ -25,7 +27,7 @@ const Adaptor = function(app, configMs, structure, mqttTopic) {
       this.app.logger.info("MQTT Adaptor - Loading stored topic mapping table");
       this.useMappingFile = true;
     } catch (error) {
-      this.app.logger.error("MQTT Adaptor - Stored topic mapping table not found. Skipped");
+      this.app.logger.debug("MQTT Adaptor - Stored topic mapping table not found. Skipped");
     }
   }
 
@@ -45,6 +47,10 @@ Adaptor.prototype.setValueForUuid = function(uuid, value, publishTopicName) {
   }
   this.states[topic] = String(value);
   this.emit('publish_state', topic, value);
+  
+  if (this.systemStatesChanged.find( val => val == uuid)) {
+    this.emit('publish_system_status');
+  }
 };
 
 Adaptor.prototype.publishStates = function() {
@@ -63,6 +69,10 @@ Adaptor.prototype.getSecuredDetails = function() {
 
 Adaptor.prototype.getHistory = function() {
   return Object.values(this.structure.controls).filter( item => item.details && item.details.hasHistory > 0).map(item => item.uuidAction);
+}
+
+Adaptor.prototype.getMessageCenter = function() {
+  return Object.values(this.structure.messageCenter).map(item => item.uuidAction);
 }
 
 Adaptor.prototype.getControlFromTopic = function(topic, data) {
@@ -94,6 +104,7 @@ Adaptor.prototype.getTopics = function() {
   // subscribe to topics. Examples:
   // <mqttTopic>/<serialnr>/<uuid>/cmd
   // <mqttTopic>/<serialnr>/states/cmd
+  // <mqttTopic>/<serialnr>/systemstate/cmd
   // <mqttTopic>/<serialnr>/<uuid>/<state>/cmd
   // <mqttTopic>/<serialnr>/<uuid>/<subcontrol>/cmd
   // <mqttTopic>/<serialnr>/<uuid>/<subcontrol>/<state>/cmd

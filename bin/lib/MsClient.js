@@ -3,7 +3,7 @@ const Adaptor = require("./Adaptor.js");
 const MqttClient = require("./mqttClient.js");
 const base64 = require('base-64');
 
-const MsClient = function(app, config, globalConfig, msid, mqttClient) {
+const MsClient = function (app, config, globalConfig, msid, mqttClient) {
   if (!globalConfig.Miniserver[msid]) {
     app.logger.error("Miniserver with id " + msid + " not found.");
     return;
@@ -21,7 +21,7 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
   // check configuration variables
   const retainMessage = config.miniserver[msid].retain_message | false;
   const publishTopicNames = config.miniserver[msid].publish_topic_names | false;
-  
+
   let mqttTopic = config.miniserver[msid].mqtt_topic_ms;
   if (mqttTopic === undefined || !mqttTopic.length) {
     mqttTopic = 'loxone';
@@ -48,56 +48,85 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
   function publishSecuredDetails() {
     let ms = globalConfig.Miniserver[msid];
     let details = msAdapter.getSecuredDetails();
-    details.forEach( uuid => {
+    details.forEach(uuid => {
       fetch("http://" + ms.Ipaddress + ":" + ms.Port + "/jdev/sps/io/" + uuid + "/securedDetails",
-      { method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Basic " + base64.encode(ms.Admin +  ":" + ms.Pass)
-        }
-      }).then( response => {
-        if (response.status !== 200) {
-          app.logger.error('Error fetching securedDetails for control ' + uuid + '. Status code: ' + response.status);
-          return;
-        }
-        response.json().then( data => {
-          if (!data.LL.value) return;  // unexpected payload, do not publish
-          let payload = data.LL.value;
-          app.logger.debug('Publish securedDetails for control ' + uuid + ':' + payload);
-          let topic = mqttTopic + '/' + msSerialNr + '/' + uuid + '/securedDetails';
-          publishTopic(topic, payload);
+        { method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Basic " + base64.encode(ms.Admin + ":" + ms.Pass)
+          }
+        }).then(response => {
+          if (response.status !== 200) {
+            app.logger.error('Error fetching securedDetails for control ' + uuid + '. Status code: ' + response.status);
+            return;
+          }
+          response.json().then(data => {
+            if (!data.LL.value) return; // unexpected payload, do not publish
+            let payload = data.LL.value;
+            app.logger.debug('Publish securedDetails for control ' + uuid + ':' + payload);
+            let topic = mqttTopic + '/' + msSerialNr + '/' + uuid + '/securedDetails';
+            publishTopic(topic, payload);
+          });
+        }).catch(error => {
+          app.logger.error('Fetch error : ', error);
         });
-      }).catch( error => {
-        app.logger.error('Fetch error : ', error);
-      });
     });
   }
 
   function publishHistory() {
     let ms = globalConfig.Miniserver[msid];
     let details = msAdapter.getHistory();
-    details.forEach( uuid => {
+    details.forEach(uuid => {
       fetch("http://" + ms.Ipaddress + ":" + ms.Port + "/jdev/sps/io/" + uuid + "/gethistory",
-      { method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Basic " + base64.encode(ms.Admin +  ":" + ms.Pass)
-        }
-      }).then( response => {
-        if (response.status !== 200) {
-          app.logger.error('Error fetching history for control ' + uuid + '. Status code: ' + response.status);
-          return;
-        }
-        response.json().then( data => {
-          if (!data) return;  // no data available, do not publish
-          let payload = JSON.stringify(data);
-          app.logger.debug('Publish history for control ' + uuid + ':' + payload);
-          let topic = mqttTopic + '/' + msSerialNr + '/' + uuid + '/history';
-          publishTopic(topic, payload);
+        { method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Basic " + base64.encode(ms.Admin + ":" + ms.Pass)
+          }
+        }).then(response => {
+          if (response.status !== 200) {
+            app.logger.error('Error fetching history for control ' + uuid + '. Status code: ' + response.status);
+            return;
+          }
+          response.json().then(data => {
+            if (!data) return; // no data available, do not publish
+            let payload = JSON.stringify(data);
+            app.logger.debug('Publish history for control ' + uuid + ':' + payload);
+            let topic = mqttTopic + '/' + msSerialNr + '/' + uuid + '/history';
+            publishTopic(topic, payload);
+          });
+        }).catch(error => {
+          app.logger.error('Fetch error : ', error);
         });
-      }).catch( error => {
-        app.logger.error('Fetch error : ', error);
-      });
+    });
+  }
+
+  function publishSystemStatus() {
+    let ms = globalConfig.Miniserver[msid];
+    let details = msAdapter.getMessageCenter();
+    details.forEach(uuid => {
+      fetch("http://" + ms.Ipaddress + ":" + ms.Port + "/jdev/sps/io/" + uuid + "/getEntries/2",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Basic " + base64.encode(ms.Admin + ":" + ms.Pass)
+          }
+        }).then(response => {
+          if (response.status !== 200) {
+            app.logger.error('Error fetching system status with uuid ' + uuid + '. Status code: ' + response.status);
+            return;
+          }
+          response.json().then(data => {
+            if (!data.LL.value) return; // unexpected payload, do not publish
+            let payload = data.LL.value.toString();
+            app.logger.debug('Publish system status with uuid ' + uuid + ':' + payload);
+            let topic = mqttTopic + '/' + msSerialNr + '/' + uuid +'/systemStatus';
+            publishTopic(topic, payload);
+          });
+        }).catch(error => {
+          app.logger.error('Fetch error : ', error);
+        });
     });
   }
 
@@ -106,7 +135,7 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
   msWebsocket.on('update_event_daytimer', updateEvent);
   msWebsocket.on('update_event_weather', updateEvent);
 
-  msWebsocket.on('get_structure_file', async function(structure) {
+  msWebsocket.on('get_structure_file', async function (structure) {
     if (msAdapter) {
       msAdapter.clear();
     }
@@ -118,7 +147,7 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
       mqttClient.subscribe(msAdapter.getTopics());
     }
 
-    msAdapter.on('publish_state', function(topic, data) {
+    msAdapter.on('publish_state', function (topic, data) {
       if (config.miniserver[msid].publish_states) {
         publishTopic(topic, data);
       } else {
@@ -126,7 +155,11 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
       }
     });
 
-    msAdapter.on('publish_mapping', function(topic, data) {
+    msAdapter.on('publish_system_status', function() {
+      publishSystemStatus();
+    });
+    
+    msAdapter.on('publish_mapping', function (topic, data) {
       if (config.miniserver[msid].publish_mapping) {
         publishTopic(topic, data);
       } else {
@@ -134,7 +167,7 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
       }
     });
 
-    msAdapter.on('publish_structure', function(topic, data) {
+    msAdapter.on('publish_structure', function (topic, data) {
       if (config.miniserver[msid].publish_structure) {
         publishTopic(topic, data);
         publishSecuredDetails();
@@ -149,22 +182,28 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
     msAdapter.publishMapping();
   });
 
-  mqttClient.on('connect', function(conack) {
+  mqttClient.on('connect', function (conack) {
     if (!msWebsocket.is_connected()) {
       msWebsocket.connect();
     }
   });
 
-  mqttClient.on('message', function(topic, message, packet) {
+  mqttClient.on('message', function (topic, message, packet) {
     // trigger to publish states
-    if (msAdapter && message.length && (topic.search(mqttTopic + "/" + msSerialNr + "/states/cmd" ) > -1)) {
+    if (msAdapter && message.length && (topic.search(mqttTopic + "/" + msSerialNr + "/states/cmd") > -1)) {
       msAdapter.publishStates();
+      return;
+    }
+
+    // trigger to publish systemstate
+    if (msAdapter && message.length && (topic.search(mqttTopic + "/" + msSerialNr + "/systemStatus/cmd") > -1)) {
+      publishSystemStatus();
       return;
     }
 
     // override mapping with user-defined mapping
     if (msAdapter && config.miniserver[msid].publish_mapping &&
-        message.length && (topic.search(mqttTopic + "/" + msSerialNr + "/mapping/cmd") > -1)) {
+      message.length && (topic.search(mqttTopic + "/" + msSerialNr + "/mapping/cmd") > -1)) {
       msAdapter.processMapping(message.toString());
       return;
     }
@@ -181,7 +220,7 @@ const MsClient = function(app, config, globalConfig, msid, mqttClient) {
       if (config.miniserver[msid].subscribe) {
         try {
           msWebsocket.send_cmd(control.uuidAction, control.command);
-        } catch(error) {
+        } catch (error) {
           app.logger.error("WebSocketAPI - Error in sending command. Error: " + error);
         }
       } else {
