@@ -1,6 +1,6 @@
 {
   "name": "lox2mqtt",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Loxone Miniserver communicating with MQTT server",
   "main": "lox2mqtt.js",
   "directories": {
@@ -34,7 +34,7 @@
   "homepage": "https://github.com/nufke/LoxBerry-Plugin-Lox2MQTT/",
   "dependencies": {
     "base-64": "^1.0.0",
-    "loxberry-logger": "git+https://github.com/nufke/loxberry-logger.git#9d1a7f0",
+    "loxberry-logger": "git+https://github.com/nufke/loxberry-logger.git#v0.0.2",
     "mqtt": "^4.3.7",
     "node-lox-ws-api": "git+https://github.com/codm/node-lox-ws-api#0.4.5-bugfix4",
     "pm2": "^5.3.0"

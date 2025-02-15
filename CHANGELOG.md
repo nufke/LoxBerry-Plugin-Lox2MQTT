@@ -1,5 +1,9 @@
 # Version History
 
+## v0.8.1 (BETA)
+
+ * Update loxberry-logger (resolve node-gyp build issue)
+
 ## v0.8.0 (BETA)
 
  * add exception handling when MQTT server or websocket are not accessible 
